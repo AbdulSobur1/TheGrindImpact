@@ -263,9 +263,12 @@ export default function FeedPage() {
                   Call out this member — why?
                 </p>
                 <select
+                  id="callout-reason"
+                  name="callout_reason"
                   value={calloutReason}
                   onChange={(e) => setCalloutReason(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-zinc-100 mb-3"
+                  aria-label="Callout reason"
                 >
                   {CALLOUT_REASONS.map((r) => (
                     <option key={r} value={r}>{r}</option>

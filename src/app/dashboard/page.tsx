@@ -197,6 +197,8 @@ export default function DashboardPage() {
                     {photoFile ? photoFile.name : 'Add photo (optional, required Mon)'}
                   </span>
                   <input
+                    id="session1-photo"
+                    name="session1_photo"
                     ref={photoInputRef}
                     type="file"
                     accept="image/*"
@@ -255,6 +257,8 @@ export default function DashboardPage() {
                     {photoFile ? photoFile.name : 'Add photo (optional, required Mon)'}
                   </span>
                   <input
+                    id="session2-photo"
+                    name="session2_photo"
                     type="file"
                     accept="image/*"
                     className="hidden"

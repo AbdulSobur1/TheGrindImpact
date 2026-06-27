@@ -183,7 +183,7 @@ export default function AdminPage() {
           </Button>
           {inviteLink && (
             <div className="flex items-center gap-2">
-              <Input value={inviteLink} readOnly className="flex-1 text-xs" />
+              <Input id="invite-link" name="invite_link" value={inviteLink} readOnly className="flex-1 text-xs" aria-label="Generated invite link" />
               <Button variant="outline" size="icon" onClick={handleCopyLink}>
                 {copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
               </Button>
@@ -204,11 +204,14 @@ export default function AdminPage() {
           <p className="text-xs text-zinc-500">
             Declare a rest day for the entire group. No streaks affected.
           </p>
-          <Input type="date" value={restDate} onChange={(e) => setRestDate(e.target.value)} />
+          <Input id="rest-date" name="rest_date" type="date" value={restDate} onChange={(e) => setRestDate(e.target.value)} aria-label="Rest day date" />
           <Input
+            id="rest-reason"
+            name="rest_reason"
             placeholder="Reason for rest day"
             value={restReason}
             onChange={(e) => setRestReason(e.target.value)}
+            aria-label="Reason for rest day"
           />
           <Button onClick={handleForceRestDay} disabled={!restDate || !restReason.trim()}>
             Declare Rest Day
@@ -229,9 +232,12 @@ export default function AdminPage() {
             Post a message to the feed as The Grind Pact.
           </p>
           <Input
+            id="announcement"
+            name="announcement"
             placeholder="Message to the Pact..."
             value={announcement}
             onChange={(e) => setAnnouncement(e.target.value)}
+            aria-label="Announcement message"
           />
           <Button onClick={handleAnnouncement} disabled={!announcement.trim()}>
             Post Announcement
@@ -270,10 +276,13 @@ export default function AdminPage() {
                   {removeUserId === member.user_id ? (
                     <div className="flex items-center gap-2">
                       <Input
+                        id="remove-reason"
+                        name="remove_reason"
                         placeholder="Reason..."
                         value={removeReason}
                         onChange={(e) => setRemoveReason(e.target.value)}
                         className="w-40"
+                        aria-label="Reason for removal"
                       />
                       <Button
                         variant="destructive"

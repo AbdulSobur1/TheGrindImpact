@@ -159,6 +159,8 @@ export default function OnboardingPage() {
                       <Camera className="h-6 w-6 text-zinc-100" />
                     </div>
                     <input
+                      id="profile-photo"
+                      name="profile_photo"
                       type="file"
                       accept="image/*"
                       className="hidden"
@@ -167,8 +169,10 @@ export default function OnboardingPage() {
                   </label>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-zinc-400">Display Name</label>
+                  <label htmlFor="onboarding-name" className="text-sm text-zinc-400">Display Name</label>
                   <Input
+                    id="onboarding-name"
+                    name="display_name"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="How the Pact will know you"
@@ -184,16 +188,20 @@ export default function OnboardingPage() {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm text-zinc-400">Window Start</label>
+                    <label htmlFor="session1-start" className="text-sm text-zinc-400">Window Start</label>
                     <Input
+                      id="session1-start"
+                      name="session1_start"
                       type="time"
                       value={session1Start}
                       onChange={(e) => setSession1Start(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-zinc-400">Window End</label>
+                    <label htmlFor="session1-end" className="text-sm text-zinc-400">Window End</label>
                     <Input
+                      id="session1-end"
+                      name="session1_end"
                       type="time"
                       value={session1End}
                       onChange={(e) => setSession1End(e.target.value)}
@@ -213,16 +221,20 @@ export default function OnboardingPage() {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm text-zinc-400">Window Start</label>
+                    <label htmlFor="session2-start" className="text-sm text-zinc-400">Window Start</label>
                     <Input
+                      id="session2-start"
+                      name="session2_start"
                       type="time"
                       value={session2Start}
                       onChange={(e) => setSession2Start(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-zinc-400">Window End</label>
+                    <label htmlFor="session2-end" className="text-sm text-zinc-400">Window End</label>
                     <Input
+                      id="session2-end"
+                      name="session2_end"
                       type="time"
                       value={session2End}
                       onChange={(e) => setSession2End(e.target.value)}

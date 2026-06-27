@@ -141,8 +141,10 @@ export default function InvitePage({ params }: InvitePageProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm text-zinc-400">Display Name</label>
+              <label htmlFor="invite-name" className="text-sm text-zinc-400">Display Name</label>
               <Input
+                id="invite-name"
+                name="display_name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
@@ -150,8 +152,10 @@ export default function InvitePage({ params }: InvitePageProps) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-zinc-400">Email</label>
+              <label htmlFor="invite-email" className="text-sm text-zinc-400">Email</label>
               <Input
+                id="invite-email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -160,8 +164,10 @@ export default function InvitePage({ params }: InvitePageProps) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-zinc-400">Password</label>
+              <label htmlFor="invite-password" className="text-sm text-zinc-400">Password</label>
               <Input
+                id="invite-password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
