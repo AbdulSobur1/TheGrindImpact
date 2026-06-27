@@ -132,68 +132,92 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-emerald-500 border-t-transparent rounded-full" />
+        <div className="animate-spin h-6 w-6 border-2 border-[#C8FF00] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            {isSunday()
-              ? "It's Sunday. Rest day. You're welcome."
-              : isRestDay
-              ? "Rest day declared. Don't get used to it."
-              : 'Two sessions. No excuses.'}
-          </p>
-        </div>
+    <div className="space-y-6 animate-fade-in">
+      {/* Header - Big greeting */}
+      <div className="space-y-1">
+        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">
+          {profile?.display_name ? `HEY, ${profile.display_name.split(' ')[0].toUpperCase()}` : 'WELCOME BACK'}
+        </h1>
+        <p className="text-[#888888] text-sm font-medium mt-1">
+          {isSunday()
+            ? "It's Sunday. Rest day. You're welcome."
+            : isRestDay
+            ? "Rest day declared. Don't get used to it."
+            : 'Two sessions. Show up. No excuses.'}
+        </p>
       </div>
+
+      {/* Today's goals indicator */}
+      {!isSunday() && !isRestDay && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold uppercase tracking-widest text-[#888888]">Today's Goals</span>
+            <span className="font-bold text-[#C8FF00]">2 SESSIONS</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-[#222222] overflow-hidden">
+            <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-[#C8FF00] to-[#C8FF00]/40 transition-all duration-500 ease-out shadow-[0_0_12px_rgba(200,255,0,0.15)]" />
+          </div>
+        </div>
+      )}
 
       {/* Status message */}
       {message && (
         <div
-          className={`px-4 py-3 rounded-lg border text-sm ${
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm animate-slide-up ${
             message.type === 'error'
-              ? 'bg-red-500/10 border-red-500/20 text-red-400'
-              : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+              ? 'bg-[#FF3B30]/8 border-[#FF3B30]/15 text-[#FF3B30]'
+              : 'bg-[#30D158]/8 border-[#30D158]/15 text-[#30D158]'
           }`}
         >
-          <p className="sarcasm-text">{message.text}</p>
+          <span className="text-lg">{message.type === 'error' ? '⚠️' : '✅'}</span>
+          <p className="font-medium sarcasm-text">{message.text}</p>
         </div>
       )}
 
-      {/* Quick Actions - Session Logging */}
+      {/* Session Cards - Workout Modules */}
       {!isSunday() && !isRestDay && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <Card
-            className={`border-zinc-800 ${
+            className={`border-[#222222] transition-all duration-300 hover:scale-[1.02] hover:brightness-110 ${
               s1Status === 'open'
-                ? 'window-open border-emerald-500/30'
+                ? 'window-open border-[#C8FF00]/20'
                 : s1Status === 'closed'
-                ? 'opacity-60'
+                ? 'opacity-50'
                 : ''
             }`}
           >
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Clock className="h-4 w-4 text-emerald-500" />
-                Session 1 {s1Status === 'open' ? '(Open)' : s1Status === 'upcoming' ? '(Upcoming)' : '(Closed)'}
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-black uppercase tracking-wider flex items-center gap-2">
+                  <Clock className={`h-4 w-4 ${s1Status === 'open' ? 'text-[#C8FF00]' : s1Status === 'upcoming' ? 'text-[#FF9500]' : 'text-[#666666]'}`} />
+                  SESSION 1
+                </CardTitle>
+                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                  s1Status === 'open'
+                    ? 'bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20'
+                    : s1Status === 'upcoming'
+                    ? 'bg-[#FF9500]/10 text-[#FF9500] border border-[#FF9500]/20'
+                    : 'bg-[#1C1C1C] text-[#666666] border border-[#222222]'
+                }`}>
+                  {s1Status === 'open' ? '● LIVE' : s1Status === 'upcoming' ? 'UPCOMING' : 'CLOSED'}
+                </span>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-xs text-zinc-500">
-                Window: {formatTime(profile?.session_1_start)} - {formatTime(profile?.session_1_end)}
-              </p>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2 text-xs text-[#888888] font-medium">
+                <span>Window: {formatTime(profile?.session_1_start)} — {formatTime(profile?.session_1_end)}</span>
+              </div>
 
-              {/* Photo upload */}
               {s1Status === 'open' && (
-                <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-800 cursor-pointer hover:border-zinc-700 transition-colors">
-                  <Camera className="h-4 w-4 text-zinc-400" />
-                  <span className="text-xs text-zinc-400">
+                <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#222222] cursor-pointer hover:border-[#3F3F3F] hover:bg-[#1C1C1C] transition-all duration-200 group">
+                  <Camera className="h-4 w-4 text-[#666666] group-hover:text-[#C8FF00] transition-colors" />
+                  <span className="text-xs text-[#888888] group-hover:text-[#F5F5F5] transition-colors">
                     {photoFile ? photoFile.name : 'Add photo (optional, required Mon)'}
                   </span>
                   <input
@@ -211,18 +235,18 @@ export default function DashboardPage() {
               <Button
                 onClick={() => handleLogSession(1)}
                 disabled={s1Status !== 'open' || logging === 1}
-                className="w-full"
+                className="w-full h-12 text-sm"
                 variant={s1Status === 'open' ? 'default' : 'secondary'}
               >
                 {logging === 1 ? (
                   <span className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-black border-t-transparent rounded-full" />
-                    Logging...
+                    <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
+                    LOGGING...
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <Zap className="h-4 w-4" />
-                    {s1Status === 'open' ? 'Log Session 1' : s1Status === 'upcoming' ? 'Not Yet' : 'Window Closed'}
+                    {s1Status === 'open' ? 'LOG SESSION 1' : s1Status === 'upcoming' ? 'NOT YET' : 'WINDOW CLOSED'}
                   </span>
                 )}
               </Button>
@@ -230,30 +254,40 @@ export default function DashboardPage() {
           </Card>
 
           <Card
-            className={`border-zinc-800 ${
+            className={`border-[#222222] transition-all duration-300 hover:scale-[1.02] hover:brightness-110 ${
               s2Status === 'open'
-                ? 'window-open border-emerald-500/30'
+                ? 'window-open border-[#C8FF00]/20'
                 : s2Status === 'closed'
-                ? 'opacity-60'
+                ? 'opacity-50'
                 : ''
             }`}
           >
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Clock className="h-4 w-4 text-blue-500" />
-                Session 2 {s2Status === 'open' ? '(Open)' : s2Status === 'upcoming' ? '(Upcoming)' : '(Closed)'}
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-black uppercase tracking-wider flex items-center gap-2">
+                  <Clock className={`h-4 w-4 ${s2Status === 'open' ? 'text-[#C8FF00]' : s2Status === 'upcoming' ? 'text-[#FF9500]' : 'text-[#666666]'}`} />
+                  SESSION 2
+                </CardTitle>
+                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                  s2Status === 'open'
+                    ? 'bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20'
+                    : s2Status === 'upcoming'
+                    ? 'bg-[#FF9500]/10 text-[#FF9500] border border-[#FF9500]/20'
+                    : 'bg-[#1C1C1C] text-[#666666] border border-[#222222]'
+                }`}>
+                  {s2Status === 'open' ? '● LIVE' : s2Status === 'upcoming' ? 'UPCOMING' : 'CLOSED'}
+                </span>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-xs text-zinc-500">
-                Window: {formatTime(profile?.session_2_start)} - {formatTime(profile?.session_2_end)}
-              </p>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2 text-xs text-[#888888] font-medium">
+                <span>Window: {formatTime(profile?.session_2_start)} — {formatTime(profile?.session_2_end)}</span>
+              </div>
 
-              {/* Photo upload */}
               {s2Status === 'open' && (
-                <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-800 cursor-pointer hover:border-zinc-700 transition-colors">
-                  <Camera className="h-4 w-4 text-zinc-400" />
-                  <span className="text-xs text-zinc-400">
+                <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#222222] cursor-pointer hover:border-[#3F3F3F] hover:bg-[#1C1C1C] transition-all duration-200 group">
+                  <Camera className="h-4 w-4 text-[#666666] group-hover:text-[#C8FF00] transition-colors" />
+                  <span className="text-xs text-[#888888] group-hover:text-[#F5F5F5] transition-colors">
                     {photoFile ? photoFile.name : 'Add photo (optional, required Mon)'}
                   </span>
                   <input
@@ -270,18 +304,18 @@ export default function DashboardPage() {
               <Button
                 onClick={() => handleLogSession(2)}
                 disabled={s2Status !== 'open' || logging === 2}
-                className="w-full"
+                className="w-full h-12 text-sm"
                 variant={s2Status === 'open' ? 'default' : 'secondary'}
               >
                 {logging === 2 ? (
                   <span className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-black border-t-transparent rounded-full" />
-                    Logging...
+                    <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
+                    LOGGING...
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <Camera className="h-4 w-4" />
-                    {s2Status === 'open' ? 'Log Session 2' : s2Status === 'upcoming' ? 'Not Yet' : 'Window Closed'}
+                    {s2Status === 'open' ? 'LOG SESSION 2' : s2Status === 'upcoming' ? 'NOT YET' : 'WINDOW CLOSED'}
                   </span>
                 )}
               </Button>
@@ -290,33 +324,37 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Rest day card */}
       {(isSunday() || isRestDay) && (
-        <Card className="border-zinc-800 bg-zinc-900/30">
-          <CardContent className="p-8 text-center">
-            <div className="text-4xl mb-3">😴</div>
-            <p className="text-zinc-400">
-              {isSunday()
-                ? "Rest day. Your streak is safe. The grind will be here tomorrow."
-                : "The admin declared a rest day. Enjoy it while it lasts."}
-            </p>
+        <Card className="border-[#222222] bg-[#111111]/50">
+          <CardContent className="py-10 text-center space-y-4">
+            <div className="text-5xl">😴</div>
+            <div>
+              <p className="text-lg font-black uppercase tracking-tight text-[#F5F5F5] mb-1">REST DAY</p>
+              <p className="text-sm text-[#888888] font-medium">
+                {isSunday()
+                  ? "Your streak is safe. The grind will be here tomorrow."
+                  : "The admin declared a rest day. Enjoy it while it lasts."}
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Watchouts */}
       {watchouts.length > 0 && (
-        <Card className="border-red-500/10">
+        <Card className="border-[#FF3B30]/15">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-red-400">
+            <CardTitle className="text-sm font-black uppercase tracking-wider flex items-center gap-2 text-[#FF3B30]">
               <AlertTriangle className="h-4 w-4" />
-              Watchouts
+              WATCHOUTS
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-3">
             {watchouts.map((w, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg bg-red-500/5 border border-red-500/10"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#FF3B30]/5 border border-[#FF3B30]/10 hover:bg-[#FF3B30]/8 transition-colors"
               >
                 <Avatar
                   src={w.user.photo_url}
@@ -324,45 +362,45 @@ export default function DashboardPage() {
                   fallback={w.user.display_name?.charAt(0)}
                   size="sm"
                 />
-                <div>
-                  <p className="text-sm font-medium">{w.user.display_name}</p>
-                  <p className="text-xs text-zinc-400 sarcasm-text">{w.message}</p>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-[#F5F5F5]">{w.user.display_name}</p>
+                  <p className="text-xs text-[#888888] font-medium sarcasm-text">{w.message}</p>
                 </div>
-                <span className="ml-auto text-lg">⚠️</span>
+                <span className="text-lg">⚠️</span>
               </div>
             ))}
           </CardContent>
         </Card>
       )}
 
-      {/* Info Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="border-zinc-800">
-          <CardContent className="p-4 text-center">
-            <Flame className="h-5 w-5 text-orange-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{stats?.current_daily_streak ?? 0}</p>
-            <p className="text-xs text-zinc-500">Day Streak</p>
+      {/* Stats Row - Scoreboard style */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+        <Card className="border-[#222222] hover:border-[#FF9500]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,149,0,0.06)] hover:scale-[1.02]">
+          <CardContent className="p-5 text-center space-y-1">
+            <Flame className="h-5 w-5 text-[#FF9500] mx-auto" />
+            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5] stat-glow">{stats?.current_daily_streak ?? 0}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Day Streak</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800">
-          <CardContent className="p-4 text-center">
-            <Trophy className="h-5 w-5 text-yellow-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{stats?.current_weekly_streak ?? 0}</p>
-            <p className="text-xs text-zinc-500">Week Streak</p>
+        <Card className="border-[#222222] hover:border-[#FF9500]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,149,0,0.06)] hover:scale-[1.02]">
+          <CardContent className="p-5 text-center space-y-1">
+            <Trophy className="h-5 w-5 text-[#FF9500] mx-auto" />
+            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">{stats?.current_weekly_streak ?? 0}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Week Streak</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800">
-          <CardContent className="p-4 text-center">
-            <CheckCircle2 className="h-5 w-5 text-emerald-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{stats?.total_sessions ?? 0}</p>
-            <p className="text-xs text-zinc-500">Completed</p>
+        <Card className="border-[#222222] hover:border-[#30D158]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(48,209,88,0.06)] hover:scale-[1.02]">
+          <CardContent className="p-5 text-center space-y-1">
+            <CheckCircle2 className="h-5 w-5 text-[#30D158] mx-auto" />
+            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">{stats?.total_sessions ?? 0}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Completed</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800">
-          <CardContent className="p-4 text-center">
-            <XCircle className="h-5 w-5 text-red-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{stats?.missed_sessions ?? 0}</p>
-            <p className="text-xs text-zinc-500">Missed</p>
+        <Card className="border-[#222222] hover:border-[#FF3B30]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,59,48,0.06)] hover:scale-[1.02]">
+          <CardContent className="p-5 text-center space-y-1">
+            <XCircle className="h-5 w-5 text-[#FF3B30] mx-auto" />
+            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">{stats?.missed_sessions ?? 0}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Missed</p>
           </CardContent>
         </Card>
       </div>

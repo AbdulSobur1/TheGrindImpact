@@ -11,33 +11,35 @@ interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const sizeClasses = {
-  sm: 'h-8 w-8 text-xs',
-  md: 'h-10 w-10 text-sm',
-  lg: 'h-14 w-14 text-lg',
-  xl: 'h-20 w-20 text-2xl',
+  sm: 'h-8 w-8 text-[10px]',
+  md: 'h-10 w-10 text-xs',
+  lg: 'h-14 w-14 text-sm',
+  xl: 'h-20 w-20 text-lg',
 };
 
 function Avatar({ className, src, alt = '', fallback, size = 'md', ...props }: AvatarProps) {
   const [error, setError] = React.useState(false);
+  const hasImage = !!src && !error;
 
   return (
     <div
       className={cn(
-        'relative flex shrink-0 overflow-hidden rounded-full',
+        'relative flex shrink-0 overflow-hidden rounded-full ring-2 ring-[#222222] ring-offset-2 ring-offset-[#080808]',
         sizeClasses[size],
         className
       )}
       {...props}
     >
-      {src && !error ? (
+      {hasImage ? (
         <img
-          src={src}
+          src={src!}
           alt={alt}
           className="aspect-square h-full w-full object-cover"
           onError={() => setError(true)}
+          loading="lazy"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-zinc-400 font-medium">
+        <div className="flex h-full w-full items-center justify-center bg-[#1C1C1C] text-[#888888] font-bold">
           {fallback || alt?.charAt(0)?.toUpperCase() || '?'}
         </div>
       )}

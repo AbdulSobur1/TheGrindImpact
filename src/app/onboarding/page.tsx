@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { completeOnboarding, updateProfilePhoto } from '@/lib/actions';
-import { Dumbbell, Camera } from 'lucide-react';
+import { Dumbbell, Camera, ArrowRight, Check, ChevronRight } from 'lucide-react';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -24,7 +24,6 @@ export default function OnboardingPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Detect timezone
   const [timezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   useEffect(() => {
@@ -32,7 +31,6 @@ export default function OnboardingPage() {
       router.push('/login');
     }
     if (!loading && user && profile?.session_1_start) {
-      // Already onboarded
       router.push('/dashboard');
     }
   }, [user, profile, loading, router]);
@@ -51,11 +49,8 @@ export default function OnboardingPage() {
     const s2Start = parseInt(session2Start.split(':')[0]) * 60 + parseInt(session2Start.split(':')[1]);
     const s2End = parseInt(session2End.split(':')[0]) * 60 + parseInt(session2End.split(':')[1]);
 
-    // Session 1 must end before 2PM (14:00)
     if (s1End > 14 * 60) return 'Session 1 must end before 2:00 PM';
     if (s1Start >= s1End) return 'Session 1 end time must be after start time';
-
-    // Session 2 must start after 2PM (14:00)
     if (s2Start < 14 * 60) return 'Session 2 must start after 2:00 PM';
     if (s2Start >= s2End) return 'Session 2 end time must be after start time';
 
@@ -76,7 +71,6 @@ export default function OnboardingPage() {
 
     setSubmitting(true);
 
-    // Upload photo if provided
     if (photoFile) {
       const formData = new FormData();
       formData.append('photo', photoFile);
@@ -100,51 +94,59 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="animate-spin h-6 w-6 border-2 border-emerald-500 border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center bg-[#080808]">
+        <div className="animate-spin h-6 w-6 border-2 border-[#C8FF00] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-8">
-      <div className="w-full max-w-lg space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#080808] px-4 py-8">
+      <div className="w-full max-w-lg space-y-8">
         <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <Dumbbell className="h-8 w-8 text-emerald-500" />
+          <div className="flex justify-center mb-5">
+            <div className="h-16 w-16 rounded-2xl bg-[#C8FF00]/10 flex items-center justify-center">
+              <Dumbbell className="h-8 w-8 text-[#C8FF00]" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold mb-2">Welcome to The Grind Pact</h1>
-          <p className="text-zinc-400">Set up your profile before we get started</p>
+          <h1 className="text-2xl font-black tracking-tight text-[#F5F5F5] mb-2">WELCOME TO THE GRIND PACT</h1>
+          <p className="text-[#888888] text-sm font-medium">Set up your profile before we get started</p>
         </div>
 
         {/* Step indicator */}
-        <div className="flex justify-center gap-2">
+        <div className="flex items-center justify-center gap-3">
           {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`h-2 w-16 rounded-full transition-colors ${
-                s <= step ? 'bg-emerald-500' : 'bg-zinc-800'
-              }`}
-            />
+            <div key={s} className="flex items-center gap-3">
+              <div
+                className={`h-10 w-10 rounded-xl flex items-center justify-center text-sm font-black transition-all duration-300 ${
+                  s <= step
+                    ? 'bg-[#C8FF00] text-[#080808] shadow-lg shadow-[#C8FF00]/15'
+                    : 'bg-[#1C1C1C] text-[#666666] border border-[#222222]'
+                }`}
+              >
+                {s < step ? <Check className="h-4 w-4" /> : s}
+              </div>
+              {s < 3 && (
+                <div className={`h-0.5 w-12 rounded-full transition-colors duration-300 ${s < step ? 'bg-[#C8FF00]' : 'bg-[#222222]'}`} />
+              )}
+            </div>
           ))}
         </div>
 
-        <Card className="border-zinc-800 bg-zinc-900/50">
+        <Card className="border-[#222222] bg-[#111111]/90 backdrop-blur-xl">
           <CardHeader>
-            <CardTitle>
-              {step === 1 && 'Profile Setup'}
-              {step === 2 && 'Session Window 1 (Morning)'}
-              {step === 3 && 'Session Window 2 (Evening)'}
+            <CardTitle className="text-lg font-black tracking-tight text-[#F5F5F5]">
+              {step === 1 && 'PROFILE SETUP'}
+              {step === 2 && 'MORNING SESSION'}
+              {step === 3 && 'EVENING SESSION'}
             </CardTitle>
-            <CardDescription className="text-zinc-400">
+            <CardDescription className="text-[#888888] mt-1">
               {step === 1 && 'Set your display name and optional profile photo'}
               {step === 2 && 'Morning session must complete before 2:00 PM'}
               {step === 3 && 'Evening session must start after 2:00 PM'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             {step === 1 && (
               <>
                 <div className="flex justify-center">
@@ -155,8 +157,8 @@ export default function OnboardingPage() {
                       fallback={displayName?.charAt(0) || '?'}
                       size="xl"
                     />
-                    <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Camera className="h-6 w-6 text-zinc-100" />
+                    <div className="absolute inset-0 rounded-full bg-[#080808]/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <Camera className="h-6 w-6 text-[#F5F5F5]" />
                     </div>
                     <input
                       id="profile-photo"
@@ -169,7 +171,7 @@ export default function OnboardingPage() {
                   </label>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="onboarding-name" className="text-sm text-zinc-400">Display Name</label>
+                  <label htmlFor="onboarding-name" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Display Name</label>
                   <Input
                     id="onboarding-name"
                     name="display_name"
@@ -178,9 +180,10 @@ export default function OnboardingPage() {
                     placeholder="How the Pact will know you"
                   />
                 </div>
-                <p className="text-xs text-zinc-500">
-                  Timezone detected: {timezone}
-                </p>
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#1C1C1C] border border-[#222222]">
+                  <span className="text-xs text-[#888888]">🕐 Timezone detected:</span>
+                  <span className="text-xs font-bold text-[#F5F5F5]">{timezone}</span>
+                </div>
               </>
             )}
 
@@ -188,7 +191,7 @@ export default function OnboardingPage() {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label htmlFor="session1-start" className="text-sm text-zinc-400">Window Start</label>
+                    <label htmlFor="session1-start" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Window Start</label>
                     <Input
                       id="session1-start"
                       name="session1_start"
@@ -198,7 +201,7 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="session1-end" className="text-sm text-zinc-400">Window End</label>
+                    <label htmlFor="session1-end" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Window End</label>
                     <Input
                       id="session1-end"
                       name="session1_end"
@@ -208,10 +211,10 @@ export default function OnboardingPage() {
                     />
                   </div>
                 </div>
-                <div className="bg-zinc-800/50 rounded-lg p-3">
-                  <p className="text-xs text-zinc-400">
-                    ⏰ Must end before 2:00 PM. This is your morning/early session.
-                    Workouts are every day except Sunday.
+                <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#1C1C1C] border border-[#222222]">
+                  <span className="text-sm mt-0.5">⏰</span>
+                  <p className="text-xs text-[#888888] leading-relaxed">
+                    Must end before <strong className="text-[#F5F5F5]">2:00 PM</strong>. This is your morning/early session. Workouts are every day except Sunday.
                   </p>
                 </div>
               </>
@@ -221,7 +224,7 @@ export default function OnboardingPage() {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label htmlFor="session2-start" className="text-sm text-zinc-400">Window Start</label>
+                    <label htmlFor="session2-start" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Window Start</label>
                     <Input
                       id="session2-start"
                       name="session2_start"
@@ -231,7 +234,7 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="session2-end" className="text-sm text-zinc-400">Window End</label>
+                    <label htmlFor="session2-end" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Window End</label>
                     <Input
                       id="session2-end"
                       name="session2_end"
@@ -241,34 +244,49 @@ export default function OnboardingPage() {
                     />
                   </div>
                 </div>
-                <div className="bg-zinc-800/50 rounded-lg p-3">
-                  <p className="text-xs text-zinc-400">
-                    ⏰ Must start after 2:00 PM. This is your afternoon/evening session.
-                    Complete both sessions daily to maintain your streak.
+                <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#1C1C1C] border border-[#222222]">
+                  <span className="text-sm mt-0.5">⏰</span>
+                  <p className="text-xs text-[#888888] leading-relaxed">
+                    Must start after <strong className="text-[#F5F5F5]">2:00 PM</strong>. This is your afternoon/evening session. Complete both sessions daily to maintain your streak.
                   </p>
                 </div>
               </>
             )}
 
             {error && (
-              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                {error}
-              </p>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#FF3B30]/8 border border-[#FF3B30]/15">
+                <p className="text-sm text-[#FF3B30] font-medium">{error}</p>
+              </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 pt-2">
               {step > 1 && (
-                <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
-                  Back
+                <Button
+                  variant="outline"
+                  onClick={() => setStep(step - 1)}
+                  className="flex-1 h-12"
+                >
+                  BACK
                 </Button>
               )}
               {step < 3 ? (
-                <Button onClick={() => setStep(step + 1)} className="flex-1">
-                  Next
+                <Button onClick={() => setStep(step + 1)} className="flex-1 h-12">
+                  <span className="flex items-center gap-2">
+                    NEXT <ChevronRight className="h-4 w-4" />
+                  </span>
                 </Button>
               ) : (
-                <Button onClick={handleComplete} disabled={submitting} className="flex-1">
-                  {submitting ? 'Setting up...' : "Let's Go"}
+                <Button onClick={handleComplete} disabled={submitting} className="flex-1 h-12">
+                  {submitting ? (
+                    <span className="flex items-center gap-2">
+                      <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
+                      SETTING UP...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      LET&apos;S GO <ArrowRight className="h-4 w-4" />
+                    </span>
+                  )}
                 </Button>
               )}
             </div>

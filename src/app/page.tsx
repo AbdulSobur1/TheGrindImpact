@@ -20,14 +20,17 @@ export default function HomePage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="text-center space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#080808]">
+      <div className="text-center space-y-6">
         <div className="flex justify-center">
-          <div className="h-16 w-16 rounded-xl bg-emerald-500/10 flex items-center justify-center animate-pulse">
-            <Dumbbell className="h-8 w-8 text-emerald-500" />
+          <div className="h-16 w-16 rounded-2xl bg-[#C8FF00]/8 flex items-center justify-center animate-pulse-glow">
+            <Dumbbell className="h-8 w-8 text-[#C8FF00]" />
           </div>
         </div>
-        <p className="text-zinc-400 text-sm">Loading The Grind Pact...</p>
+        <div className="space-y-2">
+          <p className="text-[#888888] text-sm font-bold uppercase tracking-widest animate-pulse">Loading</p>
+          <p className="text-[#666666] text-xs font-medium">THE GRIND PACT</p>
+        </div>
       </div>
     </div>
   );

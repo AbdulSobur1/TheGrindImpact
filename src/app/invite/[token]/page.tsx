@@ -82,7 +82,6 @@ export default function InvitePage({ params }: InvitePageProps) {
       setError(result.error);
       setLoading(false);
     } else {
-      // Sign them in
       const supabase = createBrowserClient();
       await supabase.auth.signInWithPassword({ email, password });
       router.push('/onboarding');
@@ -92,9 +91,9 @@ export default function InvitePage({ params }: InvitePageProps) {
 
   if (verifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="flex items-center gap-3 text-zinc-400">
-          <div className="h-5 w-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#080808]">
+        <div className="flex items-center gap-3 text-[#888888] font-bold uppercase tracking-widest text-xs">
+          <div className="h-5 w-5 border-2 border-[#C8FF00] border-t-transparent rounded-full animate-spin" />
           Verifying invite link...
         </div>
       </div>
@@ -103,20 +102,20 @@ export default function InvitePage({ params }: InvitePageProps) {
 
   if (!linkValid) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
-        <Card className="w-full max-w-md border-red-500/20 bg-zinc-900/50">
+      <div className="min-h-screen flex items-center justify-center bg-[#080808] px-4">
+        <Card className="w-full max-w-md border-[#FF3B30]/20 bg-[#111111]/90 backdrop-blur-xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">Dead Link</CardTitle>
-            <CardDescription className="text-zinc-400">
+            <div className="text-5xl mb-4">💀</div>
+            <CardTitle className="text-xl text-[#FF3B30]">DEAD LINK</CardTitle>
+            <CardDescription className="text-[#888888]">
               This link is dead. Ask the admin for a new one.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <div className="text-6xl">💀</div>
             {error && (
-              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                {error}
-              </p>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#FF3B30]/8 border border-[#FF3B30]/15">
+                <p className="text-sm text-[#FF3B30] font-medium">{error}</p>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -125,23 +124,28 @@ export default function InvitePage({ params }: InvitePageProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
-      <Card className="w-full max-w-md border-zinc-800 bg-zinc-900/50">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="h-14 w-14 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <Dumbbell className="h-7 w-7 text-emerald-500" />
+    <div className="min-h-screen flex items-center justify-center bg-[#080808] px-4 relative overflow-hidden">
+      {/* Ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#C8FF00]/3 blur-[120px] pointer-events-none" />
+
+      <Card className="w-full max-w-md border-[#222222] bg-[#111111]/90 backdrop-blur-xl relative z-10">
+        <CardHeader className="text-center pb-2">
+          <div className="flex justify-center mb-5">
+            <div className="h-16 w-16 rounded-2xl bg-[#C8FF00]/10 flex items-center justify-center">
+              <Dumbbell className="h-8 w-8 text-[#C8FF00]" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">You're Invited</CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardTitle className="text-2xl font-black tracking-tight text-[#F5F5F5]">
+            YOU&apos;RE INVITED
+          </CardTitle>
+          <CardDescription className="text-[#888888] text-sm font-medium mt-1">
             Join The Grind Pact. No excuses.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="pt-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="invite-name" className="text-sm text-zinc-400">Display Name</label>
+              <label htmlFor="invite-name" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Display Name</label>
               <Input
                 id="invite-name"
                 name="display_name"
@@ -152,7 +156,7 @@ export default function InvitePage({ params }: InvitePageProps) {
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="invite-email" className="text-sm text-zinc-400">Email</label>
+              <label htmlFor="invite-email" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Email</label>
               <Input
                 id="invite-email"
                 name="email"
@@ -164,7 +168,7 @@ export default function InvitePage({ params }: InvitePageProps) {
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="invite-password" className="text-sm text-zinc-400">Password</label>
+              <label htmlFor="invite-password" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Password</label>
               <Input
                 id="invite-password"
                 name="password"
@@ -178,13 +182,20 @@ export default function InvitePage({ params }: InvitePageProps) {
             </div>
 
             {error && (
-              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                {error}
-              </p>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#FF3B30]/8 border border-[#FF3B30]/15">
+                <p className="text-sm text-[#FF3B30] font-medium">{error}</p>
+              </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating account...' : 'Join The Pact'}
+            <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
+                  CREATING ACCOUNT...
+                </span>
+              ) : (
+                'JOIN THE PACT'
+              )}
             </Button>
           </form>
         </CardContent>

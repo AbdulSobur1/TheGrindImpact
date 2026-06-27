@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Dumbbell } from 'lucide-react';
+import { Dumbbell, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -31,23 +31,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
-      <Card className="w-full max-w-md border-zinc-800 bg-zinc-900/50">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="h-14 w-14 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <Dumbbell className="h-7 w-7 text-emerald-500" />
+    <div className="min-h-screen flex items-center justify-center bg-[#080808] px-4 relative overflow-hidden">
+      {/* Ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#C8FF00]/3 blur-[120px] pointer-events-none" />
+
+      <Card className="w-full max-w-md border-[#222222] bg-[#111111]/90 backdrop-blur-xl relative z-10">
+        <CardHeader className="text-center pb-2">
+          <div className="flex justify-center mb-5">
+            <div className="h-16 w-16 rounded-2xl bg-[#C8FF00]/10 flex items-center justify-center">
+              <Dumbbell className="h-8 w-8 text-[#C8FF00]" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">The Grind Pact</CardTitle>
-          <CardDescription className="text-zinc-400">
+          <CardTitle className="text-2xl font-black tracking-tight text-[#F5F5F5]">
+            THE GRIND PACT
+          </CardTitle>
+          <CardDescription className="text-[#888888] text-sm font-medium mt-1">
             No excuses. Just results.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="pt-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="login-email" className="text-sm text-zinc-400">Email</label>
+              <label htmlFor="login-email" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Email</label>
               <Input
                 id="login-email"
                 name="email"
@@ -59,7 +64,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="login-password" className="text-sm text-zinc-400">Password</label>
+              <label htmlFor="login-password" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Password</label>
               <Input
                 id="login-password"
                 name="password"
@@ -72,18 +77,26 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                {error}
-              </p>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#FF3B30]/8 border border-[#FF3B30]/15">
+                <Zap className="h-4 w-4 text-[#FF3B30] shrink-0" />
+                <p className="text-sm text-[#FF3B30] font-medium">{error}</p>
+              </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
+                  SIGNING IN...
+                </span>
+              ) : (
+                'SIGN IN'
+              )}
             </Button>
 
-            <p className="text-center text-sm text-zinc-500">
+            <p className="text-center text-xs font-medium text-[#666666]">
               Only invited members can join.{' '}
-              <span className="text-emerald-500">Ask the admin for an invite link.</span>
+              <span className="text-[#C8FF00]">Ask the admin for an invite link.</span>
             </p>
           </form>
         </CardContent>
