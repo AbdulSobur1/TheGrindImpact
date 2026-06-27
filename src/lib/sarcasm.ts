@@ -98,7 +98,55 @@ const mvpMessages = [
   "The crown goes to {name}. It's heavy. Hope your neck is ready.",
 ];
 
-// 8. Watchout roasts
+// 8. Workout-specific roasts
+const missedWorkoutMessages = [
+  "Skipped your workout? Your future self just sighed.",
+  "That exercise isn't going to do itself. Actually, apparently neither are you.",
+  "Your program called. It's disappointed. Again.",
+  "Missed a day. Your gains are in mourning.",
+  "You had one job: move your body. You chose not to. Bold.",
+  "The barbell is waiting. Are you? No, clearly not.",
+  "'Rest day' is a concept. 'Lazy day' is a lifestyle. You're choosing the latter.",
+  "Your workout program has a 100% attendance rate. You? Not so much.",
+  "Skipping today? Every rep you didn't do is a rep someone else did.",
+  "Tomorrow you'll say 'I'll start fresh.' Tomorrow you is tired of your excuses.",
+];
+
+const goalSpecificRoasts: Record<string, string[]> = {
+  greek_physique: [
+    "Skipping? That Greek god physique isn't going to sculpt itself.",
+    "Michelangelo didn't take days off. Neither should you.",
+    "Your V-taper called. It's feeling neglected.",
+    "Abs are made in the kitchen and the gym. You're skipping both.",
+  ],
+  bulk: [
+    "Skipping a bulk day? That's how you stay 'skinny bulk' forever.",
+    "Mass doesn't build itself. But apparently neither do you.",
+    "You're supposed to be an anvil. Right now you're more of a pebble.",
+  ],
+  cut: [
+    "Skipping on a cut? Those abs aren't going to reveal themselves.",
+    "Every missed session is fat saying 'thank you'.",
+    "The blade is sharp. You? Not so much today.",
+  ],
+  curves: [
+    "Skipping? Your hourglass just lost some sand.",
+    "Curves come from consistency. You just chose inconsistency.",
+    "That perfect silhouette needs work. Not rest.",
+  ],
+  glutes: [
+    "Skipping glute day? Hope you didn't want to sit comfortably ever again.",
+    "Your glutes called. They're feeling abandoned.",
+    "Every squat you skip is a squat someone else is doing for that round lift.",
+    "No pain, no gain. You chose no pain. So no gain. Simple math.",
+  ],
+  sculpt: [
+    "Skipping sculpt day? Michelangelo didn't take breaks either.",
+    "A sculpture takes daily chiseling. You just put down the chisel.",
+  ],
+};
+
+// 9. Watchout roasts
 const watchoutRoasts: Record<string, string[]> = {
   sleeping: [
     "Still sleeping? Bold choice.",
@@ -141,6 +189,12 @@ export const SarcasmEngine = {
   },
   watchout: (type: keyof typeof watchoutRoasts): string => {
     return pickRandom(watchoutRoasts[type] || watchoutRoasts.sleeping);
+  },
+  missedWorkout: (): string => pickRandom(missedWorkoutMessages),
+  goalRoast: (goal: string): string => {
+    const roasts = goalSpecificRoasts[goal];
+    if (roasts && roasts.length > 0) return pickRandom(roasts);
+    return pickRandom(missedWorkoutMessages);
   },
   adminKick: (name: string): string => {
     return `${name} has left The Grind Pact. Voluntarily or not.`;

@@ -1527,3 +1527,324 @@ export async function getIsTodayRestDay(): Promise<boolean> {
   const restDays = await getRestDays();
   return restDays.some((rd) => rd.date === getTodayDateString());
 }
+
+// ─── WORKOUT ACTIONS ───
+
+export async function getWorkoutPrograms() {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from('workout_programs')
+    .select('*')
+    .eq('is_active', true)
+    .order('name');
+  return (data || []) as WorkoutProgram[];
+}
+
+export async function getWorkoutProgram(slug: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data: program } = await supabase
+    .from('workout_programs')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (!program) return null;
+
+  const { data: days } = await supabase
+    .from('program_days')
+    .select('*')
+    .eq('program_slug', slug)
+    .order('week_number')
+    .order('day_number');
+
+  // Get exercises for each day
+  const dayIds = (days || []).map((d) => d.id);
+  const { data: dayExercises } = await supabase
+    .from('program_day_exercises')
+    .select('*')
+    .in('program_day_id', dayIds)
+    .order('order_index');
+
+  const exerciseSlugs = [...new Set((dayExercises || []).map((de) => de.exercise_slug))];
+  const { data: exercises } = await supabase
+    .from('exercises')
+    .select('*')
+    .in('slug', exerciseSlugs);
+
+  const exerciseMap = new Map(exercises?.map((e) => [e.slug, e]) || []);
+
+  // Map exercises to their days
+  const dayExerciseMap = new Map<string, any[]>();
+  (dayExercises || []).forEach((de) => {
+    const existing = dayExerciseMap.get(de.program_day_id) || [];
+    existing.push({ ...de, exercise: exerciseMap.get(de.exercise_slug) || null });
+    dayExerciseMap.set(de.program_day_id, existing);
+  });
+
+  const daysWithExercises = (days || []).map((day) => ({
+    ...day,
+    exercises: dayExerciseMap.get(day.id) || [],
+  }));
+
+  return { ...program, days: daysWithExercises };
+}
+
+export async function getExercisesByGoal(goal: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from('exercises')
+    .select('*')
+    .contains('target_goals', [goal])
+    .eq('is_active', true)
+    .order('name');
+  return (data || []) as Exercise[];
+}
+
+export async function getAllExercises() {
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from('exercises')
+    .select('*')
+    .eq('is_active', true)
+    .order('muscle_group')
+    .order('name');
+  return (data || []) as Exercise[];
+}
+
+export async function setMemberGoal(goal: string, programSlug?: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase.from('member_goals').upsert({
+    user_id: user.id,
+    primary_goal: goal,
+    active_program_slug: programSlug || null,
+    start_date: getTodayDateString(),
+    updated_at: new Date().toISOString(),
+  });
+
+  if (error) return { error: error.message };
+  revalidatePath('/dashboard');
+  revalidatePath('/profile');
+  return { success: true };
+}
+
+export async function getMemberGoal() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: goal } = await supabase
+    .from('member_goals')
+    .select('*, program:workout_programs(*)')
+    .eq('user_id', user.id)
+    .single();
+
+  return goal as MemberGoal | null;
+}
+
+export async function getTodaysWorkout() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  // Get member's active program
+  const { data: goal } = await supabase
+    .from('member_goals')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!goal?.active_program_slug) return null;
+
+  // Calculate which day of the program we're on
+  const startDate = new Date(goal.start_date);
+  const today = new Date();
+  const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const programDay = (daysSinceStart % 7) + 1; // 1-indexed day of the week
+  const weekNumber = Math.floor(daysSinceStart / 7) + 1;
+
+  const { data: program } = await supabase
+    .from('workout_programs')
+    .select('*')
+    .eq('slug', goal.active_program_slug)
+    .single();
+
+  if (!program) return null;
+
+  // Get today's program day
+  const { data: day } = await supabase
+    .from('program_days')
+    .select('*')
+    .eq('program_slug', goal.active_program_slug)
+    .eq('week_number', Math.min(weekNumber, program.weeks))
+    .eq('day_number', programDay)
+    .single();
+
+  if (!day) return { program, day: null, exercises: [], weekNumber: Math.min(weekNumber, program.weeks), dayOfWeek: programDay };
+
+  // Get exercises for this day
+  const { data: dayExercises } = await supabase
+    .from('program_day_exercises')
+    .select('*, exercise:exercises(*)')
+    .eq('program_day_id', day.id)
+    .order('order_index');
+
+  return {
+    program,
+    day,
+    exercises: dayExercises || [],
+    weekNumber: Math.min(weekNumber, program.weeks),
+    dayOfWeek: programDay,
+  };
+}
+
+export async function logWorkoutExercises(
+  sessionNumber: 1 | 2,
+  windowDate: string,
+  exercises: { slug: string; sets: number; reps: string; weight?: number }[]
+) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  // Find the check-in for this session
+  const { data: checkIn } = await supabase
+    .from('check_ins')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('session_number', sessionNumber)
+    .eq('window_date', windowDate)
+    .single();
+
+  if (!checkIn) {
+    return { error: 'Complete the session check-in first before logging exercises.' };
+  }
+
+  // Insert exercise logs
+  const logs = exercises.map((ex) => ({
+    user_id: user.id,
+    check_in_id: checkIn.id,
+    exercise_slug: ex.slug,
+    session_number: sessionNumber,
+    window_date: windowDate,
+    sets_completed: ex.sets,
+    reps_completed: ex.reps,
+    weight_kg: ex.weight || null,
+  }));
+
+  const { error } = await supabase.from('exercise_logs').insert(logs);
+  if (error) return { error: error.message };
+
+  revalidatePath('/dashboard');
+  return { success: true };
+}
+
+export async function getTodayExerciseLogs(windowDate: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from('exercise_logs')
+    .select('*, exercise:exercises(*)')
+    .eq('user_id', user.id)
+    .eq('window_date', windowDate)
+    .order('session_number');
+
+  return (data || []) as ExerciseLog[];
+}
+
+export async function getProgressPhotos() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from('progress_photos')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('taken_at', { ascending: false });
+
+  return (data || []) as ProgressPhoto[];
+}
+
+export async function uploadProgressPhoto(formData: FormData) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const file = formData.get('photo') as File;
+  const bodyPart = formData.get('body_part') as string;
+
+  if (!file || !bodyPart) {
+    return { error: 'Photo and body part are required' };
+  }
+
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${user.id}/progress/${Date.now()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('profile-photos')
+    .upload(fileName, file);
+
+  if (uploadError) return { error: uploadError.message };
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('profile-photos')
+    .getPublicUrl(fileName);
+
+  const { error: insertError } = await supabase.from('progress_photos').insert({
+    user_id: user.id,
+    photo_url: publicUrl,
+    body_part: bodyPart,
+    taken_at: getTodayDateString(),
+  });
+
+  if (insertError) return { error: insertError.message };
+
+  revalidatePath('/progress');
+  return { success: true, url: publicUrl };
+}
+
+export async function saveMeasurements(data: {
+  weight_kg?: number;
+  chest_cm?: number;
+  waist_cm?: number;
+  hips_cm?: number;
+  arms_cm?: number;
+  thighs_cm?: number;
+  glutes_cm?: number;
+  body_fat_pct?: number;
+}) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase.from('measurements').upsert({
+    user_id: user.id,
+    ...data,
+    measured_at: getTodayDateString(),
+  });
+
+  if (error) return { error: error.message };
+  revalidatePath('/progress');
+  return { success: true };
+}
+
+export async function getMeasurements() {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from('measurements')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('measured_at', { ascending: false });
+
+  return (data || []) as Measurement[];
+}
+
+import type { WorkoutProgram, Exercise, ExerciseLog, MemberGoal, ProgressPhoto, Measurement } from '@/types';

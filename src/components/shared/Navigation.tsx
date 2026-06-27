@@ -19,12 +19,16 @@ import {
   Dumbbell,
   Menu,
   X,
+  Dumbbell as Barbell,
+  TrendingUp,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@/lib/supabase';
 
 const memberNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/workouts', label: 'Workouts', icon: Barbell },
+  { href: '/progress', label: 'Progress', icon: TrendingUp },
   { href: '/feed', label: 'Feed', icon: Newspaper },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { href: '/profile', label: 'Profile', icon: User },

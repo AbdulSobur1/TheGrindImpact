@@ -24,8 +24,14 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  Target,
+  ChevronRight,
 } from 'lucide-react';
-import type { Profile } from '@/types';
+import Link from 'next/link';
+import { getTodaysWorkout } from '@/lib/actions';
+import { MUSCLE_GROUP_LABELS, type GoalCategory } from '@/types';
+import { SarcasmEngine } from '@/lib/sarcasm';
+import type { Profile, WorkoutProgram, ProgramDay, ProgramDayExercise, Exercise, MemberGoal } from '@/types';
 
 interface WatchoutItem {
   user: Profile;
@@ -48,7 +54,13 @@ export default function DashboardPage() {
     total_sessions: number;
     missed_sessions: number;
   } | null>(null);
-  const [loggingSession, setLoggingSession] = useState<number | null>(null);
+  const [todaysWorkout, setTodaysWorkout] = useState<{
+    program: WorkoutProgram;
+    day: ProgramDay | null;
+    exercises: (ProgramDayExercise & { exercise: Exercise })[];
+    weekNumber: number;
+    dayOfWeek: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -73,6 +85,8 @@ export default function DashboardPage() {
       ]);
       setWatchouts(w as WatchoutItem[]);
       setIsRestDay(restDay);
+      const workout = await getTodaysWorkout();
+      setTodaysWorkout(workout as any);
       if (memberStats) {
         const totalCheckIns = memberStats.session_log?.reduce(
           (acc: number, day: any) => {
@@ -178,6 +192,51 @@ export default function DashboardPage() {
           <span className="text-lg">{message.type === 'error' ? '⚠️' : '✅'}</span>
           <p className="font-medium sarcasm-text">{message.text}</p>
         </div>
+      )}
+
+      {/* Today's Workout from Active Program */}
+      {!isSunday() && !isRestDay && todaysWorkout?.day && todaysWorkout.day.session_type !== 'rest' && (
+        <Card className="border-[#C8FF00]/20 bg-[#C8FF00]/3">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-[#C8FF00]">
+                <Target className="h-4 w-4" />
+                TODAY'S WORKOUT — {todaysWorkout.program.name}
+              </CardTitle>
+              <Link href={`/workouts/${todaysWorkout.program.slug}`}>
+                <Button variant="ghost" size="sm" className="text-xs gap-1">
+                  VIEW PROGRAM <ChevronRight className="h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center gap-3">
+              <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20`}>
+                WEEK {todaysWorkout.weekNumber} · DAY {todaysWorkout.dayOfWeek}
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">
+                {todaysWorkout.day.session_type.toUpperCase()} · {todaysWorkout.day.focus_area || ''}
+              </span>
+            </div>
+            {todaysWorkout.day.note && (
+              <p className="text-[11px] text-[#888888] italic">💡 {todaysWorkout.day.note}</p>
+            )}
+            <div className="space-y-2">
+              {todaysWorkout.exercises.map((ex) => (
+                <div key={ex.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#1C1C1C] border border-[#222222]">
+                  <div>
+                    <p className="text-sm font-bold text-[#F5F5F5]">{ex.exercise?.name || ex.exercise_slug}</p>
+                    <p className="text-[10px] text-[#888888] font-medium">{ex.sets} × {ex.reps} · {ex.rest_seconds}s rest</p>
+                  </div>
+                  <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#1C1C1C] text-[#888888] border border-[#222222]">
+                    {ex.exercise?.muscle_group ? MUSCLE_GROUP_LABELS[ex.exercise.muscle_group] || ex.exercise.muscle_group : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Session Cards - Workout Modules */}
