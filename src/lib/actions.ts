@@ -1847,4 +1847,132 @@ export async function getMeasurements() {
   return (data || []) as Measurement[];
 }
 
+// ─── EXERCISE LOGGING ───
+
+export async function logExercises(logs: Array<{
+  exerciseId: string;
+  windowDate: string;
+  sets: Array<{
+    setNumber: number;
+    reps: number;
+    weight?: number;
+    duration?: number;
+    notes?: string;
+    completed: boolean;
+  }>;
+  notes?: string;
+}>) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'Not authenticated' };
+  }
+
+  // Transform sets into a single string for storage
+  const exerciseLogs = logs.map((log) => ({
+    user_id: user.id,
+    exercise_id: log.exerciseId,
+    window_date: log.windowDate,
+    sets_data: JSON.stringify(log.sets),
+    notes: log.notes || null,
+  }));
+
+  const { error } = await supabase.from('exercise_logs').insert(exerciseLogs);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // Invalidate cache for exercise logs
+  const { invalidateExerciseLogsCache } = await import('./cache');
+  await invalidateExerciseLogsCache(user.id);
+
+  revalidatePath('/dashboard');
+  revalidatePath('/progress');
+  return { success: true };
+}
+
+/**
+ * Get exercise history with progression metrics
+ */
+export async function getExerciseHistoryWithProgression(exerciseId: string, limit: number = 20) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const { data } = await supabase
+    .from('exercise_logs')
+    .select(`
+      *,
+      exercise:exercises(name, category)
+    `)
+    .eq('user_id', user.id)
+    .eq('exercise_id', exerciseId)
+    .order('window_date', { ascending: false })
+    .limit(limit);
+
+  if (!data) return [];
+
+  // Parse sets_data JSON and calculate progression metrics
+  return data.map((log: any) => ({
+    ...log,
+    sets: JSON.parse(log.sets_data || '[]'),
+    maxWeight: Math.max(
+      ...JSON.parse(log.sets_data || '[]').map((s: any) => s.weight || 0)
+    ),
+    totalReps: JSON.parse(log.sets_data || '[]').reduce(
+      (sum: number, s: any) => sum + (s.reps || 0),
+      0
+    ),
+  }));
+}
+
+/**
+ * Calculate personal records for an exercise
+ */
+export async function calculateExercisePR(exerciseId: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const { data } = await supabase
+    .from('exercise_logs')
+    .select('sets_data')
+    .eq('user_id', user.id)
+    .eq('exercise_id', exerciseId)
+    .order('window_date', { ascending: false })
+    .limit(100);
+
+  if (!data || data.length === 0) return null;
+
+  // Find max weight across all logs
+  let maxWeight = 0;
+  let maxReps = 0;
+
+  data.forEach((log: any) => {
+    const sets = JSON.parse(log.sets_data || '[]');
+    sets.forEach((set: any) => {
+      if (set.weight && set.weight > maxWeight) {
+        maxWeight = set.weight;
+      }
+      if (set.reps && set.reps > maxReps) {
+        maxReps = set.reps;
+      }
+    });
+  });
+
+  return {
+    maxWeight,
+    maxReps,
+    volume: data.length, // Number of sessions
+  };
+}
+
 import type { WorkoutProgram, Exercise, ExerciseLog, MemberGoal, ProgressPhoto, Measurement } from '@/types';
