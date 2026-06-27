@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { createBrowserClient } from '@/lib/supabase';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Award, Lock, Check, Grid3X3, Sparkles, Trophy } from 'lucide-react';
 import type { Badge, MemberBadge } from '@/types';
@@ -53,8 +54,33 @@ export default function BadgesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        <div className="space-y-3">
+          <Skeleton className="h-10 w-40" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-12" />
+          </div>
+          <Skeleton className="h-2 w-full rounded-full" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-20 rounded-lg" />
+          <Skeleton className="h-9 w-28 rounded-lg" />
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="rounded-2xl border border-[#242424] bg-[#141414] p-5 text-center space-y-3">
+              <Skeleton className="h-12 w-12 mx-auto" />
+              <Skeleton className="h-4 w-24 mx-auto" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-4 w-16 mx-auto rounded-full" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

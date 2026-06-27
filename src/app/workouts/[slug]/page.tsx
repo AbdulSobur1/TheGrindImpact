@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { getWorkoutProgram, setMemberGoal } from '@/lib/actions';
 import { ArrowLeft, Dumbbell, Clock, Users, Check, ChevronDown, ChevronUp, Target } from 'lucide-react';
@@ -70,8 +71,45 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
 
   if (loading || !program) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        <Skeleton className="h-4 w-32" />
+        <div className="flex flex-col md:flex-row items-start gap-5">
+          <Skeleton className="h-16 w-16 rounded-2xl" />
+          <div className="flex-1 space-y-3">
+            <Skeleton className="h-10 w-72" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+            <div className="flex gap-4">
+              <Skeleton className="h-6 w-20 rounded-full" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+              <Skeleton className="h-6 w-24 rounded-full" />
+            </div>
+          </div>
+          <Skeleton className="h-11 w-40 rounded-xl shrink-0" />
+        </div>
+        <hr className="hr-accent" />
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-3 w-10" />
+          <div className="flex gap-1">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-8 w-10 rounded-lg" />
+            ))}
+          </div>
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl border border-[#242424] bg-[#141414] p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-5 w-16" />
+                  <Skeleton className="h-6 w-14 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-4" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

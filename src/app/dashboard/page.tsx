@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   getWatchouts,
   getIsTodayRestDay,
@@ -155,8 +156,71 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-72" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <Skeleton className="h-10 w-10 rounded-full" />
+        </div>
+        <hr className="hr-accent" />
+        {/* Workout card skeleton */}
+        <div className="rounded-2xl border border-[#242424] bg-[#141414] p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-8 w-16 rounded-lg" />
+          </div>
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="h-3 w-64" />
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#141414] border border-[#242424]">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-5 w-14 rounded-full" />
+            </div>
+          ))}
+        </div>
+        {/* Session cards skeleton */}
+        <div className="space-y-3">
+          <Skeleton className="h-3 w-32" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            {[1, 2].map((i) => (
+              <div key={i} className="rounded-2xl border border-[#242424] bg-[#141414] p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-36" />
+                <Skeleton className="h-12 w-full rounded-xl" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Progress bar skeleton */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+          <Skeleton className="h-1.5 w-full rounded-full" />
+        </div>
+        {/* Stats grid skeleton */}
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-20" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-2xl border border-[#242424] bg-[#141414] p-5 text-center space-y-3">
+                <Skeleton className="h-6 w-6 mx-auto rounded-full" />
+                <Skeleton className="h-10 w-16 mx-auto" />
+                <Skeleton className="h-3 w-20 mx-auto" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

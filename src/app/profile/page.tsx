@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { getMemberStats } from '@/lib/actions';
 import { formatTime } from '@/lib/utils';
@@ -50,8 +51,57 @@ export default function ProfilePage() {
 
   if (loading || !stats) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        {/* Profile header skeleton */}
+        <div className="rounded-2xl border border-[#242424] bg-[#141414] overflow-hidden">
+          <Skeleton className="h-28 w-full rounded-none" />
+          <div className="p-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5 -mt-14">
+              <Skeleton className="h-20 w-20 rounded-full border-4 border-[#0D0D0D]" />
+              <div className="flex-1 pt-14 sm:pt-0 space-y-2">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+              <div className="flex gap-5">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="text-center space-y-1">
+                    <Skeleton className="h-5 w-5 mx-auto rounded-full" />
+                    <Skeleton className="h-6 w-8 mx-auto" />
+                    <Skeleton className="h-3 w-14 mx-auto" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Tabs skeleton */}
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-24 rounded-lg" />
+          <Skeleton className="h-9 w-24 rounded-lg" />
+          <Skeleton className="h-9 w-24 rounded-lg" />
+        </div>
+        <hr className="hr-accent" />
+        {/* Overview grid skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+          <div className="rounded-2xl border border-[#242424] bg-[#141414] p-5 space-y-4">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+          <div className="rounded-2xl border border-[#242424] bg-[#141414] p-5 space-y-4">
+            <Skeleton className="h-4 w-24" />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-[#1A1A1A] border border-[#242424]">
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-5 w-16" />
+                </div>
+                <Skeleton className="h-6 w-6 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

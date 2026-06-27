@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { getLeaderboard } from '@/lib/actions';
 import { Trophy, Flame, Medal, Crown, TrendingUp, ArrowUp, ArrowDown, Minus, Dumbbell } from 'lucide-react';
@@ -58,8 +59,35 @@ export default function LeaderboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        <div className="space-y-3">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <hr className="hr-accent" />
+        <div className="rounded-2xl border border-[#242424] bg-[#141414] overflow-hidden">
+          <div className="p-5 pb-0">
+            <Skeleton className="h-4 w-32" />
+          </div>
+          {/* Table header skeleton */}
+          <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-4 border-b border-[#242424]">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-3 w-full" />
+            ))}
+          </div>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center gap-4 px-5 py-4 border-t border-[#242424]">
+              <Skeleton className="h-8 w-8 rounded-xl shrink-0" />
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="flex-1 space-y-1">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-12" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

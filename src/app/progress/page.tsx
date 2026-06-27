@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { getProgressPhotos, uploadProgressPhoto, getMeasurements, saveMeasurements } from '@/lib/actions';
 import { Camera, Scale, Calendar, TrendingUp, Plus, X, Weight } from 'lucide-react';
@@ -104,8 +105,27 @@ export default function ProgressPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        <div className="space-y-3">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <hr className="hr-accent" />
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-28 rounded-lg" />
+          <Skeleton className="h-9 w-36 rounded-lg" />
+        </div>
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="rounded-2xl border border-[#242424] bg-[#141414] overflow-hidden">
+              <Skeleton className="aspect-[3/4] w-full rounded-none" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

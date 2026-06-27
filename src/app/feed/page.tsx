@@ -7,6 +7,7 @@ import { createBrowserClient } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getFeedPosts, addReaction, createCallout } from '@/lib/actions';
 import { formatTime } from '@/lib/utils';
 import { Newspaper, ThumbsUp, AlertTriangle, RefreshCw, ChevronDown, MessageSquare } from 'lucide-react';
@@ -217,8 +218,37 @@ export default function FeedPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-24" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        </div>
+        <hr className="hr-accent" />
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-2xl border border-[#242424] bg-[#141414] p-5">
+              <div className="flex items-start gap-4">
+                <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                <div className="flex-1 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-16 rounded-lg" />
+                    <Skeleton className="h-8 w-16 rounded-lg" />
+                    <Skeleton className="h-8 w-16 rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

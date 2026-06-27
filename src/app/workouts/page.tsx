@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { getWorkoutPrograms, getAllExercises, setMemberGoal, getMemberGoal } from '@/lib/actions';
 import { Dumbbell, ChevronRight, Users, Clock, Target, Sparkles, Check, Search } from 'lucide-react';
@@ -63,8 +64,44 @@ export default function WorkoutsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
+        <div className="space-y-3">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <hr className="hr-accent" />
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-28 rounded-lg" />
+          <Skeleton className="h-9 w-28 rounded-lg" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-8 w-14 rounded-lg" />
+          <Skeleton className="h-8 w-14 rounded-lg" />
+          <Skeleton className="h-8 w-20 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl border border-[#242424] bg-[#141414] p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-12 w-12 rounded-2xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+              <Skeleton className="h-8 w-full" />
+              <div className="flex gap-4">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-3 w-12" />
+                <Skeleton className="h-3 w-14" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="h-9 flex-1 rounded-lg" />
+                <Skeleton className="h-9 w-9 rounded-lg" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
