@@ -24,7 +24,7 @@ function Avatar({ className, src, alt = '', fallback, size = 'md', ...props }: A
   return (
     <div
       className={cn(
-        'relative flex shrink-0 overflow-hidden rounded-full ring-2 ring-[#222222] ring-offset-2 ring-offset-[#080808]',
+        'relative flex shrink-0 overflow-hidden rounded-full ring-2 ring-[#242424] ring-offset-2 ring-offset-[#0D0D0D]',
         sizeClasses[size],
         className
       )}
@@ -39,7 +39,7 @@ function Avatar({ className, src, alt = '', fallback, size = 'md', ...props }: A
           loading="lazy"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[#1C1C1C] text-[#888888] font-bold">
+        <div className="flex h-full w-full items-center justify-center bg-[#1A1A1A] text-[#999999] font-bold">
           {fallback || alt?.charAt(0)?.toUpperCase() || '?'}
         </div>
       )}

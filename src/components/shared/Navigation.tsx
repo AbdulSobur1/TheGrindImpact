@@ -19,7 +19,6 @@ import {
   Dumbbell,
   Menu,
   X,
-  Dumbbell as Barbell,
   TrendingUp,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -27,7 +26,7 @@ import { createBrowserClient } from '@/lib/supabase';
 
 const memberNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/workouts', label: 'Workouts', icon: Barbell },
+  { href: '/workouts', label: 'Workouts', icon: Dumbbell },
   { href: '/progress', label: 'Progress', icon: TrendingUp },
   { href: '/feed', label: 'Feed', icon: Newspaper },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
@@ -78,16 +77,16 @@ export function Navigation() {
   return (
     <>
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-[#222222] bg-[#080808]/90 backdrop-blur-xl px-4 h-14 md:hidden">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-[#242424] bg-[#0D0D0D]/90 backdrop-blur-xl px-4 h-14 md:hidden">
         <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-lg bg-[#C8FF00]/10 flex items-center justify-center">
-            <Dumbbell className="h-3.5 w-3.5 text-[#C8FF00]" />
+          <div className="h-7 w-7 rounded-lg bg-[#FF5C00]/10 flex items-center justify-center">
+            <Dumbbell className="h-3.5 w-3.5 text-[#FF5C00]" />
           </div>
-          <span className="font-black text-xs tracking-[0.15em] text-[#F5F5F5]">THE GRIND PACT</span>
+          <span className="font-black text-xs tracking-[0.15em] text-white">THE GRIND PACT</span>
         </div>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 text-[#888888] hover:text-[#F5F5F5] transition-colors rounded-lg hover:bg-[#1C1C1C]"
+          className="p-2 text-[#999999] hover:text-white transition-colors rounded-lg hover:bg-[#1A1A1A]"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -96,7 +95,7 @@ export function Navigation() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-[#080808]/80 backdrop-blur-sm md:hidden animate-fade-in"
+          className="fixed inset-0 z-40 bg-[#0D0D0D]/80 backdrop-blur-sm md:hidden animate-fade-in"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -104,26 +103,27 @@ export function Navigation() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed top-0 left-0 z-50 h-full w-64 border-r border-[#222222] bg-[#080808]/95 backdrop-blur-xl transform transition-transform duration-300 ease-out md:translate-x-0 md:static md:z-auto',
+          'fixed top-0 left-0 z-50 h-full w-64 border-r border-[#242424] bg-[#0D0D0D]/95 backdrop-blur-xl transform transition-transform duration-300 ease-out md:translate-x-0 md:static md:z-auto',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center gap-3 px-6 py-7 border-b border-[#222222]">
-            <div className="h-10 w-10 rounded-xl bg-[#C8FF00]/10 flex items-center justify-center">
-              <Dumbbell className="h-5 w-5 text-[#C8FF00]" />
+          <div className="flex items-center gap-3 px-6 py-7 border-b border-[#242424]">
+            <div className="h-10 w-10 rounded-xl bg-[#FF5C00]/10 flex items-center justify-center">
+              <Dumbbell className="h-5 w-5 text-[#FF5C00]" />
             </div>
             <div>
-              <h1 className="font-black text-sm tracking-[0.1em] text-[#F5F5F5]">THE GRIND PACT</h1>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#888888]">No excuses.</p>
+              <h1 className="font-black text-sm tracking-[0.1em] text-white">THE GRIND PACT</h1>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#999999]">No excuses.</p>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || 
+                (item.href !== '/dashboard' && item.href !== '/feed' && pathname.startsWith(item.href));
               const Icon = item.icon;
               return (
                 <Link
@@ -133,11 +133,11 @@ export function Navigation() {
                   className={cn(
                     'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 ease-out',
                     isActive
-                      ? 'bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20 shadow-[0_0_12px_rgba(200,255,0,0.06)]'
-                      : 'text-[#888888] hover:text-[#F5F5F5] hover:bg-[#1C1C1C] hover:border hover:border-[#222222]'
+                      ? 'bg-[#FF5C00]/10 text-[#FF5C00] border border-[#FF5C00]/20 shadow-[0_0_12px_rgba(255,92,0,0.06)]'
+                      : 'text-[#999999] hover:text-white hover:bg-[#1A1A1A] hover:border hover:border-[#242424]'
                   )}
                 >
-                  <Icon className={cn('h-4 w-4', isActive ? 'text-[#C8FF00]' : '')} />
+                  <Icon className={cn('h-4 w-4', isActive ? 'text-[#FF5C00]' : '')} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -149,12 +149,12 @@ export function Navigation() {
             <Link
               href="/feed"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#888888] hover:text-[#F5F5F5] hover:bg-[#1C1C1C] transition-all duration-200 ease-out relative"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#999999] hover:text-white hover:bg-[#1A1A1A] transition-all duration-200 ease-out relative"
             >
               <Bell className="h-4 w-4" />
               <span>Notifications</span>
               {unreadCount > 0 && (
-                <span className="ml-auto bg-[#C8FF00] text-[#080808] text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
+                <span className="ml-auto bg-[#FF5C00] text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -162,11 +162,11 @@ export function Navigation() {
           </div>
 
           {/* User section */}
-          <div className="border-t border-[#222222] p-4 space-y-3">
+          <div className="border-t border-[#242424] p-4 space-y-3">
             <Link
               href="/profile"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#1C1C1C] transition-all duration-200 ease-out group"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#1A1A1A] transition-all duration-200 ease-out group"
             >
               <Avatar
                 src={profile?.photo_url}
@@ -175,10 +175,10 @@ export function Navigation() {
                 size="sm"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#F5F5F5] truncate group-hover:text-[#C8FF00] transition-colors">
+                <p className="text-sm font-bold text-white truncate group-hover:text-[#FF5C00] transition-colors">
                   {profile?.display_name || 'User'}
                 </p>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-[#666666] capitalize">{profile?.role}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-[#555555] capitalize">{profile?.role}</p>
               </div>
             </Link>
 
@@ -186,7 +186,7 @@ export function Navigation() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-start text-[#888888] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-xl"
+                className="w-full justify-start text-[#999999] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-xl"
                 type="submit"
               >
                 <LogOut className="h-4 w-4 mr-2" />

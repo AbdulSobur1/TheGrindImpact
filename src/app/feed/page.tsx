@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { getFeedPosts, addReaction, createCallout } from '@/lib/actions';
 import { formatTime } from '@/lib/utils';
-import { Newspaper, ThumbsUp, AlertTriangle, RefreshCw, ChevronDown } from 'lucide-react';
+import { Newspaper, ThumbsUp, AlertTriangle, RefreshCw, ChevronDown, MessageSquare } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import type { FeedPost, Profile, CalloutReason } from '@/types';
 
@@ -31,9 +31,9 @@ function FeedCard({ post, onReact, onCallout }: { post: FeedPost; onReact: (emoj
 
   return (
     <Card
-      className={`border-[#222222] transition-all duration-200 hover:border-[#3F3F3F] ${
+      className={`border-[#242424] transition-all duration-200 hover:border-[#3F3F3F] hover:scale-[1.01] ${
         isMissed ? 'border-[#FF3B30]/20 bg-[#FF3B30]/3' : ''
-      } ${isSystem ? 'border-[#C8FF00]/15 bg-[#C8FF00]/3' : ''}`}
+      } ${isSystem ? 'border-[#FF5C00]/15 bg-[#FF5C00]/3' : ''}`}
     >
       <CardContent className="p-5">
         <div className="flex items-start gap-4">
@@ -45,7 +45,7 @@ function FeedCard({ post, onReact, onCallout }: { post: FeedPost; onReact: (emoj
               size="md"
             />
           ) : (
-            <div className="h-10 w-10 rounded-full bg-[#C8FF00]/10 flex items-center justify-center shrink-0 border border-[#C8FF00]/20">
+            <div className="h-10 w-10 rounded-full bg-[#FF5C00]/10 flex items-center justify-center shrink-0 border border-[#FF5C00]/20">
               <span className="text-lg">📢</span>
             </div>
           )}
@@ -53,11 +53,11 @@ function FeedCard({ post, onReact, onCallout }: { post: FeedPost; onReact: (emoj
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               {!isSystem ? (
-                <span className="font-bold text-sm text-[#F5F5F5]">{post.profile?.display_name || 'Unknown'}</span>
+                <span className="font-bold text-sm text-white">{post.profile?.display_name || 'Unknown'}</span>
               ) : (
-                <span className="font-bold text-sm text-[#C8FF00]">THE GRIND PACT</span>
+                <span className="font-bold text-sm text-[#FF5C00]">THE GRIND PACT</span>
               )}
-              <span className="text-xs text-[#666666] font-medium">
+              <span className="text-xs text-[#555555] font-medium">
                 {new Date(post.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
               {post.type === 'callout' && (
@@ -66,12 +66,12 @@ function FeedCard({ post, onReact, onCallout }: { post: FeedPost; onReact: (emoj
                 </span>
               )}
               {post.type === 'badge' && (
-                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20">
+                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] border border-[#FF5C00]/20">
                   Badge
                 </span>
               )}
               {post.type === 'mvp' && (
-                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#FF9500]/10 text-[#FF9500] border border-[#FF9500]/20">
+                <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#FF9F0A]/10 text-[#FF9F0A] border border-[#FF9F0A]/20">
                   👑 MVP
                 </span>
               )}
@@ -83,8 +83,8 @@ function FeedCard({ post, onReact, onCallout }: { post: FeedPost; onReact: (emoj
                   isMissed
                     ? 'text-[#FF3B30]/80'
                     : isSystem
-                    ? 'text-[#C8FF00]/80'
-                    : 'text-[#A3A3A3]'
+                    ? 'text-[#FF5C00]/80'
+                    : 'text-[#B3B3B3]'
                 } ${post.type === 'completed' || post.type === 'missed' ? 'sarcasm-text' : ''}`}
               >
                 {post.sarcasm_message}
@@ -102,12 +102,12 @@ function FeedCard({ post, onReact, onCallout }: { post: FeedPost; onReact: (emoj
                       onClick={() => onReact(emoji)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                         count > 0
-                          ? 'bg-[#1C1C1C] border border-[#222222] hover:bg-[#222222]'
-                          : 'hover:bg-[#1C1C1C] opacity-40 hover:opacity-100 border border-transparent hover:border-[#222222]'
+                          ? 'bg-[#1A1A1A] border border-[#242424] hover:bg-[#242424]'
+                          : 'hover:bg-[#1A1A1A] opacity-40 hover:opacity-100 border border-transparent hover:border-[#242424]'
                       }`}
                     >
                       <span className="text-sm">{emoji}</span>
-                      {count > 0 && <span className="text-[#888888]">{count}</span>}
+                      {count > 0 && <span className="text-[#999999]">{count}</span>}
                     </button>
                   );
                 })}
@@ -218,18 +218,18 @@ export default function FeedPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#C8FF00] border-t-transparent rounded-full" />
+        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 md:space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">FEED</h1>
-          <p className="text-[#888888] text-sm font-medium mt-1">See what the Pact is up to</p>
+        <div className="space-y-1">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-white">FEED</h1>
+          <p className="text-[#999999] text-sm font-medium mt-1">See what the Pact is up to</p>
         </div>
         <Button
           variant="outline"
@@ -243,19 +243,19 @@ export default function FeedPage() {
         </Button>
       </div>
 
-      <Separator />
+      <hr className="hr-accent" />
 
       {posts.length === 0 ? (
-        <Card className="border-[#222222]">
+        <Card className="border-[#242424]">
           <CardContent className="py-16 text-center space-y-4">
             <div className="flex justify-center">
-              <div className="h-16 w-16 rounded-2xl bg-[#1C1C1C] flex items-center justify-center">
-                <Newspaper className="h-8 w-8 text-[#666666]" />
+              <div className="h-16 w-16 rounded-2xl bg-[#1A1A1A] flex items-center justify-center border border-[#242424]">
+                <Newspaper className="h-8 w-8 text-[#555555]" />
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-black uppercase tracking-tight text-[#F5F5F5] mb-1">No activity yet</h3>
-              <p className="text-sm text-[#888888] font-medium">
+              <h3 className="text-lg font-black uppercase tracking-tight text-white mb-1">No activity yet</h3>
+              <p className="text-sm text-[#999999] font-medium">
                 Check-ins, callouts, and achievements will show up here.
               </p>
             </div>
@@ -264,7 +264,7 @@ export default function FeedPage() {
       ) : (
         <div className="space-y-3">
           {calloutMessage && (
-            <div className="flex items-center gap-2 px-5 py-3 rounded-xl border border-[#30D158]/15 bg-[#30D158]/8 text-[#30D158] text-sm font-medium animate-slide-up">
+            <div className="flex items-center gap-2 px-5 py-3 rounded-xl border border-[#34C759]/15 bg-[#34C759]/8 text-[#34C759] text-sm font-medium animate-slide-up">
               <span>✅</span>
               {calloutMessage}
             </div>
@@ -283,14 +283,14 @@ export default function FeedPage() {
                     name="callout_reason"
                     value={calloutReason}
                     onChange={(e) => setCalloutReason(e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-[#222222] bg-[#111111] text-sm text-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#C8FF00] focus:border-transparent appearance-none"
+                    className="w-full h-11 px-4 rounded-xl border border-[#242424] bg-[#141414] text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FF5C00] focus:border-transparent appearance-none"
                     aria-label="Callout reason"
                   >
                     {CALLOUT_REASONS.map((r) => (
                       <option key={r} value={r}>{r}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#888888] pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#999999] pointer-events-none" />
                 </div>
                 {calloutError && (
                   <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#FF3B30]/8 border border-[#FF3B30]/15 mb-4">

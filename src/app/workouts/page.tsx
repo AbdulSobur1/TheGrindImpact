@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { getWorkoutPrograms, getAllExercises, setMemberGoal, getMemberGoal } from '@/lib/actions';
-import { Dumbbell, ChevronRight, Users, Clock, Target, Sparkles, Check } from 'lucide-react';
+import { Dumbbell, ChevronRight, Users, Clock, Target, Sparkles, Check, Search } from 'lucide-react';
 import type { WorkoutProgram, Exercise, MuscleGroup } from '@/types';
 import { MUSCLE_GROUP_LABELS } from '@/types';
 
@@ -64,17 +64,20 @@ export default function WorkoutsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#C8FF00] border-t-transparent rounded-full" />
+        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 md:space-y-8 animate-fade-in">
+      {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">WORKOUTS</h1>
-        <p className="text-[#888888] text-sm font-medium mt-1">Programs designed for real results</p>
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-white">WORKOUTS</h1>
+        <p className="text-[#999999] text-sm font-medium mt-1">Programs designed for real results</p>
       </div>
+
+      <hr className="hr-accent" />
 
       {/* Tabs */}
       <div className="flex gap-2">
@@ -103,42 +106,42 @@ export default function WorkoutsPage() {
       {activeTab === 'programs' && (
         <>
           {/* Audience filter */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button variant={filter === 'all' ? 'default' : 'ghost'} size="sm" onClick={() => setFilter('all')}>ALL</Button>
             <Button variant={filter === 'men' ? 'default' : 'ghost'} size="sm" onClick={() => setFilter('men')}>MEN</Button>
             <Button variant={filter === 'women' ? 'default' : 'ghost'} size="sm" onClick={() => setFilter('women')}>WOMEN</Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
             {filteredPrograms.map((program) => {
               const isActive = memberGoal === program.slug;
               return (
                 <Card
                   key={program.slug}
-                  className={`border-[#222222] transition-all duration-200 hover:scale-[1.02] hover:border-[#3F3F3F] ${
-                    isActive ? 'ring-2 ring-[#C8FF00]/30 border-[#C8FF00]/20' : ''
+                  className={`border-[#242424] transition-all duration-200 hover:scale-[1.02] hover:border-[#3F3F3F] ${
+                    isActive ? 'ring-2 ring-[#FF5C00]/30 border-[#FF5C00]/20' : ''
                   }`}
                 >
                   <CardContent className="p-5 space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-2xl bg-[#1C1C1C] flex items-center justify-center text-2xl">
+                        <div className="h-12 w-12 rounded-2xl bg-[#1A1A1A] flex items-center justify-center text-2xl border border-[#242424]">
                           {program.emoji}
                         </div>
                         <div>
-                          <h3 className="font-black text-sm text-[#F5F5F5]">{program.name}</h3>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">
+                          <h3 className="font-black text-sm text-white">{program.name}</h3>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#999999]">
                             {program.difficulty} • {program.goal_category.replace('_', ' ')}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <p className="text-xs text-[#888888] font-medium leading-relaxed line-clamp-2">
+                    <p className="text-xs text-[#999999] font-medium leading-relaxed line-clamp-2">
                       {program.description}
                     </p>
 
-                    <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[#666666]">
+                    <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[#555555]">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {program.weeks} weeks
@@ -179,6 +182,18 @@ export default function WorkoutsPage() {
                 </Card>
               );
             })}
+
+            {filteredPrograms.length === 0 && (
+              <div className="col-span-full py-12 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="h-16 w-16 rounded-2xl bg-[#1A1A1A] flex items-center justify-center border border-[#242424]">
+                    <Dumbbell className="h-8 w-8 text-[#555555]" />
+                  </div>
+                </div>
+                <p className="text-lg font-black uppercase tracking-tight text-white mb-1">No programs found</p>
+                <p className="text-sm text-[#999999] font-medium">Check back later for new programs.</p>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -201,29 +216,41 @@ export default function WorkoutsPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {filteredExercises.map((exercise) => (
-              <Card key={exercise.slug} className="border-[#222222] hover:border-[#3F3F3F] transition-all duration-200">
+              <Card key={exercise.slug} className="border-[#242424] hover:border-[#3F3F3F] transition-all duration-200 hover:scale-[1.02]">
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-[#F5F5F5]">{exercise.name}</h4>
+                    <h4 className="text-sm font-bold text-white">{exercise.name}</h4>
                     <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${
                       exercise.category === 'compound'
-                        ? 'bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20'
-                        : 'bg-[#1C1C1C] text-[#888888] border border-[#222222]'
+                        ? 'bg-[#FF5C00]/10 text-[#FF5C00] border border-[#FF5C00]/20'
+                        : 'bg-[#1A1A1A] text-[#999999] border border-[#242424]'
                     }`}>
                       {exercise.category}
                     </span>
                   </div>
-                  <p className="text-[10px] text-[#888888] font-medium">
+                  <p className="text-[10px] text-[#999999] font-medium">
                     {MUSCLE_GROUP_LABELS[exercise.muscle_group]} • {exercise.equipment}
                   </p>
                   {exercise.description && (
-                    <p className="text-[10px] text-[#666666] leading-relaxed">{exercise.description}</p>
+                    <p className="text-[10px] text-[#555555] leading-relaxed">{exercise.description}</p>
                   )}
                 </CardContent>
               </Card>
             ))}
+
+            {filteredExercises.length === 0 && (
+              <div className="col-span-full py-12 text-center space-y-4">
+                <div className="flex justify-center">
+                  <div className="h-16 w-16 rounded-2xl bg-[#1A1A1A] flex items-center justify-center border border-[#242424]">
+                    <Search className="h-8 w-8 text-[#555555]" />
+                  </div>
+                </div>
+                <p className="text-lg font-black uppercase tracking-tight text-white mb-1">No exercises found</p>
+                <p className="text-sm text-[#999999] font-medium">Try a different muscle group.</p>
+              </div>
+            )}
           </div>
         </>
       )}

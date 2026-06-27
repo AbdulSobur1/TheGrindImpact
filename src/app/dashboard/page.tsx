@@ -6,7 +6,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import {
   getWatchouts,
   getIsTodayRestDay,
@@ -26,6 +25,7 @@ import {
   Clock,
   Target,
   ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
 import { getTodaysWorkout } from '@/lib/actions';
@@ -47,7 +47,9 @@ export default function DashboardPage() {
   const [logging, setLogging] = useState<number | null>(null);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoFileS2, setPhotoFileS2] = useState<File | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef2 = useRef<HTMLInputElement>(null);
   const [stats, setStats] = useState<{
     current_daily_streak: number;
     current_weekly_streak: number;
@@ -120,7 +122,8 @@ export default function DashboardPage() {
     setLogging(sessionNumber);
     setMessage(null);
     try {
-      const result = await logSession(sessionNumber, photoFile);
+      const photo = sessionNumber === 1 ? photoFile : photoFileS2;
+      const result = await logSession(sessionNumber, photo);
       if (result.error) {
         setMessage({ text: result.error, type: 'error' });
         setTimeout(() => setMessage(null), 4000);
@@ -129,8 +132,13 @@ export default function DashboardPage() {
           setMessage({ text: result.sarcasm_message, type: 'success' });
           setTimeout(() => setMessage(null), 4000);
         }
-        setPhotoFile(null);
-        if (photoInputRef.current) photoInputRef.current.value = '';
+        if (sessionNumber === 1) {
+          setPhotoFile(null);
+          if (photoInputRef.current) photoInputRef.current.value = '';
+        } else {
+          setPhotoFileS2(null);
+          if (photoInputRef2.current) photoInputRef2.current.value = '';
+        }
         loadDashboard();
       }
     } catch (err) {
@@ -142,43 +150,42 @@ export default function DashboardPage() {
 
   const s1Status = profile ? getWindowStatus(profile.session_1_start, profile.session_1_end) : 'closed';
   const s2Status = profile ? getWindowStatus(profile.session_2_start, profile.session_2_end) : 'closed';
+  const completedCount = [s1Status, s2Status].filter(s => s === 'closed').length;
+  const totalSessions = 2;
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#C8FF00] border-t-transparent rounded-full" />
+        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header - Big greeting */}
-      <div className="space-y-1">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">
-          {profile?.display_name ? `HEY, ${profile.display_name.split(' ')[0].toUpperCase()}` : 'WELCOME BACK'}
-        </h1>
-        <p className="text-[#888888] text-sm font-medium mt-1">
-          {isSunday()
-            ? "It's Sunday. Rest day. You're welcome."
-            : isRestDay
-            ? "Rest day declared. Don't get used to it."
-            : 'Two sessions. Show up. No excuses.'}
-        </p>
+    <div className="space-y-6 md:space-y-8 animate-fade-in">
+      {/* ─── HEADER SECTION ─── */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase text-white">
+            {profile?.display_name
+              ? `WELCOME BACK${profile.display_name.split(' ')[0] ? `, ${profile.display_name.split(' ')[0].toUpperCase()}` : ''}`
+              : 'WELCOME BACK'}
+          </h1>
+          <p className="text-[#999999] text-sm font-medium">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+        <Avatar
+          src={profile?.photo_url}
+          alt={profile?.display_name || ''}
+          fallback={profile?.display_name?.charAt(0)}
+          size="md"
+          className="ring-2 ring-[#FF5C00]/20"
+        />
       </div>
 
-      {/* Today's goals indicator */}
-      {!isSunday() && !isRestDay && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase tracking-widest text-[#888888]">Today's Goals</span>
-            <span className="font-bold text-[#C8FF00]">2 SESSIONS</span>
-          </div>
-          <div className="h-1.5 rounded-full bg-[#222222] overflow-hidden">
-            <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-[#C8FF00] to-[#C8FF00]/40 transition-all duration-500 ease-out shadow-[0_0_12px_rgba(200,255,0,0.15)]" />
-          </div>
-        </div>
-      )}
+      {/* Accent horizontal rule */}
+      <hr className="hr-accent" />
 
       {/* Status message */}
       {message && (
@@ -186,7 +193,7 @@ export default function DashboardPage() {
           className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm animate-slide-up ${
             message.type === 'error'
               ? 'bg-[#FF3B30]/8 border-[#FF3B30]/15 text-[#FF3B30]'
-              : 'bg-[#30D158]/8 border-[#30D158]/15 text-[#30D158]'
+              : 'bg-[#34C759]/8 border-[#34C759]/15 text-[#34C759]'
           }`}
         >
           <span className="text-lg">{message.type === 'error' ? '⚠️' : '✅'}</span>
@@ -194,203 +201,240 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Today's Workout from Active Program */}
+      {/* ─── TODAY'S WORKOUT ─── */}
       {!isSunday() && !isRestDay && todaysWorkout?.day && todaysWorkout.day.session_type !== 'rest' && (
-        <Card className="border-[#C8FF00]/20 bg-[#C8FF00]/3">
-          <CardHeader className="pb-3">
+        <Card className="border-[#242424] bg-[#1A1A1A]">
+          <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-[#C8FF00]">
+              <CardTitle className="text-xs font-semibold uppercase tracking-widest flex items-center gap-2 text-[#FF5C00]">
                 <Target className="h-4 w-4" />
                 TODAY'S WORKOUT — {todaysWorkout.program.name}
               </CardTitle>
               <Link href={`/workouts/${todaysWorkout.program.slug}`}>
-                <Button variant="ghost" size="sm" className="text-xs gap-1">
-                  VIEW PROGRAM <ChevronRight className="h-3 w-3" />
+                <Button variant="ghost" size="sm" className="text-xs gap-1 text-[#999999]">
+                  VIEW <ChevronRight className="h-3 w-3" />
                 </Button>
               </Link>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20`}>
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] border border-[#FF5C00]/20">
                 WEEK {todaysWorkout.weekNumber} · DAY {todaysWorkout.dayOfWeek}
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">
-                {todaysWorkout.day.session_type.toUpperCase()} · {todaysWorkout.day.focus_area || ''}
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#555555]">
+                {todaysWorkout.day.session_type.toUpperCase()}{todaysWorkout.day.focus_area ? ` · ${todaysWorkout.day.focus_area}` : ''}
               </span>
             </div>
             {todaysWorkout.day.note && (
-              <p className="text-[11px] text-[#888888] italic">💡 {todaysWorkout.day.note}</p>
+              <p className="text-[11px] text-[#999999] italic">💡 {todaysWorkout.day.note}</p>
             )}
             <div className="space-y-2">
-              {todaysWorkout.exercises.map((ex) => (
-                <div key={ex.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#1C1C1C] border border-[#222222]">
+              {todaysWorkout.exercises.slice(0, 5).map((ex) => (
+                <div key={ex.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#141414] border border-[#242424]">
                   <div>
-                    <p className="text-sm font-bold text-[#F5F5F5]">{ex.exercise?.name || ex.exercise_slug}</p>
-                    <p className="text-[10px] text-[#888888] font-medium">{ex.sets} × {ex.reps} · {ex.rest_seconds}s rest</p>
+                    <p className="text-sm font-bold text-white">{ex.exercise?.name || ex.exercise_slug}</p>
+                    <p className="text-[10px] text-[#999999] font-medium">{ex.sets} × {ex.reps} · {ex.rest_seconds}s rest</p>
                   </div>
-                  <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#1C1C1C] text-[#888888] border border-[#222222]">
+                  <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#1A1A1A] text-[#999999] border border-[#242424]">
                     {ex.exercise?.muscle_group ? MUSCLE_GROUP_LABELS[ex.exercise.muscle_group] || ex.exercise.muscle_group : ''}
                   </span>
                 </div>
               ))}
+              {todaysWorkout.exercises.length > 5 && (
+                <p className="text-xs text-[#555555] text-center font-medium">+{todaysWorkout.exercises.length - 5} more exercises</p>
+              )}
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Session Cards - Workout Modules */}
+      {/* ─── TODAY'S SESSIONS ─── */}
       {!isSunday() && !isRestDay && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <Card
-            className={`border-[#222222] transition-all duration-300 hover:scale-[1.02] hover:brightness-110 ${
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#999999]">TODAY'S SESSIONS</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            {/* Session 1 Card */}
+            <Card className={`border-[#242424] transition-all duration-200 hover:scale-[1.02] hover:brightness-110 ${
               s1Status === 'open'
-                ? 'window-open border-[#C8FF00]/20'
+                ? 'live-card-glow'
                 : s1Status === 'closed'
-                ? 'opacity-50'
+                ? 'closed-session'
                 : ''
-            }`}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-black uppercase tracking-wider flex items-center gap-2">
-                  <Clock className={`h-4 w-4 ${s1Status === 'open' ? 'text-[#C8FF00]' : s1Status === 'upcoming' ? 'text-[#FF9500]' : 'text-[#666666]'}`} />
-                  SESSION 1
-                </CardTitle>
-                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                  s1Status === 'open'
-                    ? 'bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20'
-                    : s1Status === 'upcoming'
-                    ? 'bg-[#FF9500]/10 text-[#FF9500] border border-[#FF9500]/20'
-                    : 'bg-[#1C1C1C] text-[#666666] border border-[#222222]'
-                }`}>
-                  {s1Status === 'open' ? '● LIVE' : s1Status === 'upcoming' ? 'UPCOMING' : 'CLOSED'}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-2 text-xs text-[#888888] font-medium">
-                <span>Window: {formatTime(profile?.session_1_start)} — {formatTime(profile?.session_1_end)}</span>
-              </div>
+            }`}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-bold uppercase tracking-widest text-white">
+                    SESSION 1
+                  </CardTitle>
+                  {s1Status === 'open' ? (
+                    <span className="live-badge">
+                      <span className="live-dot" />
+                      LIVE
+                    </span>
+                  ) : s1Status === 'upcoming' ? (
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#FF9F0A]/10 text-[#FF9F0A] border border-[#FF9F0A]/20">
+                      UPCOMING
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#1A1A1A] text-[#555555] border border-[#242424]">
+                      CLOSED
+                    </span>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-[#999999] font-medium">
+                  Window: {formatTime(profile?.session_1_start)} — {formatTime(profile?.session_1_end)}
+                </p>
 
-              {s1Status === 'open' && (
-                <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#222222] cursor-pointer hover:border-[#3F3F3F] hover:bg-[#1C1C1C] transition-all duration-200 group">
-                  <Camera className="h-4 w-4 text-[#666666] group-hover:text-[#C8FF00] transition-colors" />
-                  <span className="text-xs text-[#888888] group-hover:text-[#F5F5F5] transition-colors">
-                    {photoFile ? photoFile.name : 'Add photo (optional, required Mon)'}
-                  </span>
-                  <input
-                    id="session1-photo"
-                    name="session1_photo"
-                    ref={photoInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
-                  />
-                </label>
-              )}
-
-              <Button
-                onClick={() => handleLogSession(1)}
-                disabled={s1Status !== 'open' || logging === 1}
-                className="w-full h-12 text-sm"
-                variant={s1Status === 'open' ? 'default' : 'secondary'}
-              >
-                {logging === 1 ? (
-                  <span className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
-                    LOGGING...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    {s1Status === 'open' ? 'LOG SESSION 1' : s1Status === 'upcoming' ? 'NOT YET' : 'WINDOW CLOSED'}
-                  </span>
+                {s1Status === 'open' && (
+                  <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#242424] cursor-pointer hover:border-[#3F3F3F] hover:bg-[#1A1A1A] transition-all duration-200 group">
+                    <Camera className="h-4 w-4 text-[#555555] group-hover:text-[#FF5C00] transition-colors" />
+                    <span className="text-xs text-[#999999] group-hover:text-white transition-colors">
+                      {photoFile ? photoFile.name : 'Add photo (optional, required Mon)'}
+                    </span>
+                    <input
+                      id="session1-photo"
+                      name="session1_photo"
+                      ref={photoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                    />
+                  </label>
                 )}
-              </Button>
-            </CardContent>
-          </Card>
 
-          <Card
-            className={`border-[#222222] transition-all duration-300 hover:scale-[1.02] hover:brightness-110 ${
+                <Button
+                  onClick={() => handleLogSession(1)}
+                  disabled={s1Status !== 'open' || logging === 1}
+                  className={`w-full h-12 text-sm font-bold uppercase tracking-widest ${
+                    s1Status === 'open'
+                      ? 'bg-[#FF5C00] text-white hover:bg-[#FF5C00]/90 shadow-lg shadow-[#FF5C00]/15'
+                      : 'bg-[#1A1A1A] text-[#555555] border border-[#242424] cursor-not-allowed'
+                  }`}
+                >
+                  {logging === 1 ? (
+                    <span className="flex items-center gap-2">
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                      LOGGING...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      {s1Status === 'open' ? 'START SESSION' : s1Status === 'upcoming' ? 'NOT YET' : 'WINDOW CLOSED'}
+                    </span>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Session 2 Card */}
+            <Card className={`border-[#242424] transition-all duration-200 hover:scale-[1.02] hover:brightness-110 ${
               s2Status === 'open'
-                ? 'window-open border-[#C8FF00]/20'
+                ? 'live-card-glow'
                 : s2Status === 'closed'
-                ? 'opacity-50'
+                ? 'closed-session'
                 : ''
-            }`}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-black uppercase tracking-wider flex items-center gap-2">
-                  <Clock className={`h-4 w-4 ${s2Status === 'open' ? 'text-[#C8FF00]' : s2Status === 'upcoming' ? 'text-[#FF9500]' : 'text-[#666666]'}`} />
-                  SESSION 2
-                </CardTitle>
-                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                  s2Status === 'open'
-                    ? 'bg-[#C8FF00]/10 text-[#C8FF00] border border-[#C8FF00]/20'
-                    : s2Status === 'upcoming'
-                    ? 'bg-[#FF9500]/10 text-[#FF9500] border border-[#FF9500]/20'
-                    : 'bg-[#1C1C1C] text-[#666666] border border-[#222222]'
-                }`}>
-                  {s2Status === 'open' ? '● LIVE' : s2Status === 'upcoming' ? 'UPCOMING' : 'CLOSED'}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-2 text-xs text-[#888888] font-medium">
-                <span>Window: {formatTime(profile?.session_2_start)} — {formatTime(profile?.session_2_end)}</span>
-              </div>
+            }`}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-bold uppercase tracking-widest text-white">
+                    SESSION 2
+                  </CardTitle>
+                  {s2Status === 'open' ? (
+                    <span className="live-badge">
+                      <span className="live-dot" />
+                      LIVE
+                    </span>
+                  ) : s2Status === 'upcoming' ? (
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#FF9F0A]/10 text-[#FF9F0A] border border-[#FF9F0A]/20">
+                      UPCOMING
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#1A1A1A] text-[#555555] border border-[#242424]">
+                      CLOSED
+                    </span>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-[#999999] font-medium">
+                  Window: {formatTime(profile?.session_2_start)} — {formatTime(profile?.session_2_end)}
+                </p>
 
-              {s2Status === 'open' && (
-                <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#222222] cursor-pointer hover:border-[#3F3F3F] hover:bg-[#1C1C1C] transition-all duration-200 group">
-                  <Camera className="h-4 w-4 text-[#666666] group-hover:text-[#C8FF00] transition-colors" />
-                  <span className="text-xs text-[#888888] group-hover:text-[#F5F5F5] transition-colors">
-                    {photoFile ? photoFile.name : 'Add photo (optional, required Mon)'}
-                  </span>
-                  <input
-                    id="session2-photo"
-                    name="session2_photo"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
-                  />
-                </label>
-              )}
-
-              <Button
-                onClick={() => handleLogSession(2)}
-                disabled={s2Status !== 'open' || logging === 2}
-                className="w-full h-12 text-sm"
-                variant={s2Status === 'open' ? 'default' : 'secondary'}
-              >
-                {logging === 2 ? (
-                  <span className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
-                    LOGGING...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Camera className="h-4 w-4" />
-                    {s2Status === 'open' ? 'LOG SESSION 2' : s2Status === 'upcoming' ? 'NOT YET' : 'WINDOW CLOSED'}
-                  </span>
+                {s2Status === 'open' && (
+                  <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#242424] cursor-pointer hover:border-[#3F3F3F] hover:bg-[#1A1A1A] transition-all duration-200 group">
+                    <Camera className="h-4 w-4 text-[#555555] group-hover:text-[#FF5C00] transition-colors" />
+                    <span className="text-xs text-[#999999] group-hover:text-white transition-colors">
+                      {photoFileS2 ? photoFileS2.name : 'Add photo (optional, required Mon)'}
+                    </span>
+                    <input
+                      id="session2-photo"
+                      name="session2_photo"
+                      ref={photoInputRef2}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => setPhotoFileS2(e.target.files?.[0] || null)}
+                    />
+                  </label>
                 )}
-              </Button>
-            </CardContent>
-          </Card>
+
+                <Button
+                  onClick={() => handleLogSession(2)}
+                  disabled={s2Status !== 'open' || logging === 2}
+                  className={`w-full h-12 text-sm font-bold uppercase tracking-widest ${
+                    s2Status === 'open'
+                      ? 'bg-[#FF5C00] text-white hover:bg-[#FF5C00]/90 shadow-lg shadow-[#FF5C00]/15'
+                      : 'bg-[#1A1A1A] text-[#555555] border border-[#242424] cursor-not-allowed'
+                  }`}
+                >
+                  {logging === 2 ? (
+                    <span className="flex items-center gap-2">
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                      LOGGING...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Zap className="h-4 w-4" />
+                      {s2Status === 'open' ? 'START SESSION' : s2Status === 'upcoming' ? 'NOT YET' : 'WINDOW CLOSED'}
+                    </span>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
 
-      {/* Rest day card */}
+      {/* ─── PROGRESS BAR ─── */}
+      {!isSunday() && !isRestDay && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#999999]">TODAY'S PROGRESS</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#555555]">
+              {[s1Status, s2Status].filter(s => s === 'closed').length}/{totalSessions} SESSIONS
+            </span>
+          </div>
+          <div className="h-1.5 rounded-full bg-[#242424] overflow-hidden">
+            <div
+              className="progress-fill"
+              style={{ width: `${([s1Status, s2Status].filter(s => s === 'closed').length / totalSessions) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ─── REST DAY ─── */}
       {(isSunday() || isRestDay) && (
-        <Card className="border-[#222222] bg-[#111111]/50">
-          <CardContent className="py-10 text-center space-y-4">
-            <div className="text-5xl">😴</div>
-            <div>
-              <p className="text-lg font-black uppercase tracking-tight text-[#F5F5F5] mb-1">REST DAY</p>
-              <p className="text-sm text-[#888888] font-medium">
+        <Card className="border-[#242424] bg-[#1A1A1A]">
+          <CardContent className="py-12 text-center space-y-5">
+            <div className="text-6xl">😴</div>
+            <div className="space-y-2">
+              <p className="text-2xl font-black uppercase tracking-tight text-white">REST DAY</p>
+              <p className="text-sm text-[#999999] font-medium max-w-md mx-auto">
                 {isSunday()
                   ? "Your streak is safe. The grind will be here tomorrow."
                   : "The admin declared a rest day. Enjoy it while it lasts."}
@@ -400,11 +444,11 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* Watchouts */}
+      {/* ─── WATCHOUTS ─── */}
       {watchouts.length > 0 && (
-        <Card className="border-[#FF3B30]/15">
+        <Card className="border-[#FF3B30]/20">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-black uppercase tracking-wider flex items-center gap-2 text-[#FF3B30]">
+            <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#FF3B30]">
               <AlertTriangle className="h-4 w-4" />
               WATCHOUTS
             </CardTitle>
@@ -422,8 +466,8 @@ export default function DashboardPage() {
                   size="sm"
                 />
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-[#F5F5F5]">{w.user.display_name}</p>
-                  <p className="text-xs text-[#888888] font-medium sarcasm-text">{w.message}</p>
+                  <p className="text-sm font-bold text-white">{w.user.display_name}</p>
+                  <p className="text-xs text-[#999999] font-medium sarcasm-text">{w.message}</p>
                 </div>
                 <span className="text-lg">⚠️</span>
               </div>
@@ -432,36 +476,46 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* Stats Row - Scoreboard style */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-        <Card className="border-[#222222] hover:border-[#FF9500]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,149,0,0.06)] hover:scale-[1.02]">
-          <CardContent className="p-5 text-center space-y-1">
-            <Flame className="h-5 w-5 text-[#FF9500] mx-auto" />
-            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5] stat-glow">{stats?.current_daily_streak ?? 0}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Day Streak</p>
-          </CardContent>
-        </Card>
-        <Card className="border-[#222222] hover:border-[#FF9500]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,149,0,0.06)] hover:scale-[1.02]">
-          <CardContent className="p-5 text-center space-y-1">
-            <Trophy className="h-5 w-5 text-[#FF9500] mx-auto" />
-            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">{stats?.current_weekly_streak ?? 0}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Week Streak</p>
-          </CardContent>
-        </Card>
-        <Card className="border-[#222222] hover:border-[#30D158]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(48,209,88,0.06)] hover:scale-[1.02]">
-          <CardContent className="p-5 text-center space-y-1">
-            <CheckCircle2 className="h-5 w-5 text-[#30D158] mx-auto" />
-            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">{stats?.total_sessions ?? 0}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Completed</p>
-          </CardContent>
-        </Card>
-        <Card className="border-[#222222] hover:border-[#FF3B30]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,59,48,0.06)] hover:scale-[1.02]">
-          <CardContent className="p-5 text-center space-y-1">
-            <XCircle className="h-5 w-5 text-[#FF3B30] mx-auto" />
-            <p className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">{stats?.missed_sessions ?? 0}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">Missed</p>
-          </CardContent>
-        </Card>
+      {/* ─── STATS GRID ─── */}
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#999999]">YOUR STATS</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {/* Day Streak */}
+          <Card className="border-[#242424] hover:border-[#FF9F0A]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,159,10,0.06)] hover:scale-[1.02]">
+            <CardContent className="p-5 text-center space-y-2">
+              <Flame className="h-6 w-6 text-[#FF9F0A] mx-auto" />
+              <p className="text-4xl md:text-5xl font-black tabular-nums text-white stat-glow">{stats?.current_daily_streak ?? 0}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#555555]">Day Streak</p>
+            </CardContent>
+          </Card>
+
+          {/* Week Streak */}
+          <Card className="border-[#242424] hover:border-[#C8FF00]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(200,255,0,0.06)] hover:scale-[1.02]">
+            <CardContent className="p-5 text-center space-y-2">
+              <Trophy className="h-6 w-6 text-[#C8FF00] mx-auto" />
+              <p className="text-4xl md:text-5xl font-black tabular-nums text-white stat-glow-lime">{stats?.current_weekly_streak ?? 0}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#555555]">Week Streak</p>
+            </CardContent>
+          </Card>
+
+          {/* Completed */}
+          <Card className="border-[#242424] hover:border-[#34C759]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(52,199,89,0.06)] hover:scale-[1.02]">
+            <CardContent className="p-5 text-center space-y-2">
+              <CheckCircle2 className="h-6 w-6 text-[#34C759] mx-auto" />
+              <p className="text-4xl md:text-5xl font-black tabular-nums text-white">{stats?.total_sessions ?? 0}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#555555]">Completed</p>
+            </CardContent>
+          </Card>
+
+          {/* Missed */}
+          <Card className="border-[#242424] hover:border-[#FF3B30]/20 transition-all duration-200 hover:shadow-[0_0_16px_rgba(255,59,48,0.06)] hover:scale-[1.02]">
+            <CardContent className="p-5 text-center space-y-2">
+              <XCircle className="h-6 w-6 text-[#FF3B30] mx-auto" />
+              <p className="text-4xl md:text-5xl font-black tabular-nums text-white">{stats?.missed_sessions ?? 0}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#555555]">Missed</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

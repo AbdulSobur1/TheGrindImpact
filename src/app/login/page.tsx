@@ -31,28 +31,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#080808] px-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#0D0D0D] px-4 relative overflow-hidden">
       {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#C8FF00]/3 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#FF5C00]/3 blur-[120px] pointer-events-none" />
 
-      <Card className="w-full max-w-md border-[#222222] bg-[#111111]/90 backdrop-blur-xl relative z-10">
+      <Card className="w-full max-w-md border-[#242424] bg-[#141414]/90 backdrop-blur-xl relative z-10">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-5">
-            <div className="h-16 w-16 rounded-2xl bg-[#C8FF00]/10 flex items-center justify-center">
-              <Dumbbell className="h-8 w-8 text-[#C8FF00]" />
+            <div className="h-16 w-16 rounded-2xl bg-[#FF5C00]/10 flex items-center justify-center">
+              <Dumbbell className="h-8 w-8 text-[#FF5C00]" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-black tracking-tight text-[#F5F5F5]">
+          <CardTitle className="text-2xl font-black tracking-tight uppercase text-white">
             THE GRIND PACT
           </CardTitle>
-          <CardDescription className="text-[#888888] text-sm font-medium mt-1">
+          <CardDescription className="text-[#999999] text-sm font-medium mt-1">
             No excuses. Just results.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label htmlFor="login-email" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Email</label>
+              <label htmlFor="login-email" className="text-xs font-bold uppercase tracking-widest text-[#999999]">Email</label>
               <Input
                 id="login-email"
                 name="email"
@@ -64,7 +64,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="login-password" className="text-xs font-bold uppercase tracking-widest text-[#888888]">Password</label>
+              <label htmlFor="login-password" className="text-xs font-bold uppercase tracking-widest text-[#999999]">Password</label>
               <Input
                 id="login-password"
                 name="password"
@@ -86,7 +86,7 @@ export default function LoginPage() {
             <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <div className="animate-spin h-4 w-4 border-2 border-[#080808] border-t-transparent rounded-full" />
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
                   SIGNING IN...
                 </span>
               ) : (
@@ -94,9 +94,9 @@ export default function LoginPage() {
               )}
             </Button>
 
-            <p className="text-center text-xs font-medium text-[#666666]">
+            <p className="text-center text-xs font-medium text-[#555555]">
               Only invited members can join.{' '}
-              <span className="text-[#C8FF00]">Ask the admin for an invite link.</span>
+              <span className="text-[#FF5C00]">Ask the admin for an invite link.</span>
             </p>
           </form>
         </CardContent>

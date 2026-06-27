@@ -141,25 +141,25 @@ export default function AdminPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-6 w-6 border-2 border-[#C8FF00] border-t-transparent rounded-full" />
+        <div className="animate-spin h-6 w-6 border-2 border-[#FF5C00] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 md:space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="h-12 w-12 rounded-2xl bg-[#C8FF00]/10 flex items-center justify-center">
-          <Shield className="h-6 w-6 text-[#C8FF00]" />
+        <div className="h-12 w-12 rounded-2xl bg-[#FF5C00]/10 flex items-center justify-center">
+          <Shield className="h-6 w-6 text-[#FF5C00]" />
         </div>
         <div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#F5F5F5]">ADMIN PANEL</h1>
-          <p className="text-[#888888] text-sm font-medium mt-1">Control the Pact. Use your power wisely.</p>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase text-white">ADMIN PANEL</h1>
+          <p className="text-[#999999] text-sm font-medium mt-1">Control the Pact. Use your power wisely.</p>
         </div>
       </div>
 
-      <Separator />
+      <hr className="hr-accent" />
 
       {/* Status message */}
       {message && (
@@ -167,7 +167,7 @@ export default function AdminPage() {
           className={`flex items-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium animate-slide-up ${
             message.type === 'error'
               ? 'bg-[#FF3B30]/8 border-[#FF3B30]/15 text-[#FF3B30]'
-              : 'bg-[#30D158]/8 border-[#30D158]/15 text-[#30D158]'
+              : 'bg-[#34C759]/8 border-[#34C759]/15 text-[#34C759]'
           }`}
         >
           <span>{message.type === 'error' ? '⚠️' : '✅'}</span>
@@ -176,17 +176,17 @@ export default function AdminPage() {
       )}
 
       {/* Quick Actions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
         {/* Invite Section */}
-        <Card className="border-[#222222]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-[#C8FF00]">
+        <Card className="border-[#242424]">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#FF5C00]">
               <Link2 className="h-4 w-4" />
               Invite Member
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-xs text-[#888888] font-medium">
+            <p className="text-xs text-[#999999] font-medium">
               Generate a one-time invite link. Expires in 48 hours.
             </p>
             <Button onClick={handleGenerateLink} className="w-full h-11 gap-2">
@@ -204,7 +204,7 @@ export default function AdminPage() {
                   aria-label="Generated invite link"
                 />
                 <Button variant="outline" size="icon" onClick={handleCopyLink} className="shrink-0">
-                  {copied ? <Check className="h-4 w-4 text-[#30D158]" /> : <Copy className="h-4 w-4" />}
+                  {copied ? <Check className="h-4 w-4 text-[#34C759]" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
             )}
@@ -212,15 +212,15 @@ export default function AdminPage() {
         </Card>
 
         {/* Force Rest Day */}
-        <Card className="border-[#222222]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-[#FF9500]">
+        <Card className="border-[#242424]">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#FF9F0A]">
               <CalendarX className="h-4 w-4" />
               Force Rest Day
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-xs text-[#888888] font-medium">
+            <p className="text-xs text-[#999999] font-medium">
               Declare a rest day for the entire group. No streaks affected.
             </p>
             <Input
@@ -251,15 +251,15 @@ export default function AdminPage() {
         </Card>
 
         {/* Announcement */}
-        <Card className="border-[#222222]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-[#30D158]">
+        <Card className="border-[#242424]">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#34C759]">
               <Megaphone className="h-4 w-4" />
               Announcement
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-xs text-[#888888] font-medium">
+            <p className="text-xs text-[#999999] font-medium">
               Post a message to the feed as The Grind Pact.
             </p>
             <div className="relative">
@@ -275,7 +275,7 @@ export default function AdminPage() {
               <button
                 onClick={handleAnnouncement}
                 disabled={!announcement.trim()}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg bg-[#C8FF00] text-[#080808] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#C8FF00]/90 transition-colors"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg bg-[#FF5C00] text-white flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#FF5C00]/90 transition-colors"
               >
                 <Send className="h-3.5 w-3.5" />
               </button>
@@ -285,23 +285,29 @@ export default function AdminPage() {
       </div>
 
       {/* Members List */}
-      <Card className="border-[#222222]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-[#888888]">
+      <Card className="border-[#242424]">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-[#999999]">
             <Users className="h-4 w-4" />
             Members ({members.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {members.length === 0 ? (
-            <div className="py-12 text-center">
-              <p className="text-sm text-[#888888] font-medium">No members yet.</p>
+            <div className="py-12 text-center space-y-4">
+              <div className="flex justify-center">
+                <div className="h-16 w-16 rounded-2xl bg-[#1A1A1A] flex items-center justify-center border border-[#242424]">
+                  <Users className="h-8 w-8 text-[#555555]" />
+                </div>
+              </div>
+              <p className="text-lg font-black uppercase tracking-tight text-white mb-1">No members yet</p>
+              <p className="text-sm text-[#999999] font-medium">Invite some!</p>
             </div>
           ) : (
-            members.map((member) => (
+            members.map((member, i) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between px-6 py-4 border-t border-[#222222] hover:bg-[#1C1C1C]/50 transition-colors"
+                className={`flex items-center justify-between px-5 py-4 ${i > 0 ? 'border-t border-[#242424]' : ''} hover:bg-[#1A1A1A]/50 transition-colors`}
               >
                 <div className="flex items-center gap-3">
                   <Avatar
@@ -311,8 +317,8 @@ export default function AdminPage() {
                     size="sm"
                   />
                   <div>
-                    <p className="text-sm font-bold text-[#F5F5F5]">{member.display_name}</p>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#666666] capitalize">{member.role}</p>
+                    <p className="text-sm font-bold text-white">{member.display_name}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-[#555555] capitalize">{member.role}</p>
                   </div>
                 </div>
                 {member.role !== 'admin' && (
@@ -351,7 +357,7 @@ export default function AdminPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-[#888888] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-xl"
+                        className="text-[#999999] hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-xl"
                         onClick={() => setRemoveUserId(member.user_id)}
                       >
                         <UserX className="h-4 w-4" />
